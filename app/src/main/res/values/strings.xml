@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Buddga</string>
+
+    <!-- Navigation -->
+    <string name="nav_budgeting">Budgeting</string>
+    <string name="nav_accounts">Accounts</string>
+    <string name="nav_transactions">Transactions</string>
+    <string name="nav_cash_flow">Cash Flow</string>
+
+    <!-- Budgeting Screen -->
+    <string name="category_spending">Category Spending</string>
+    <string name="to_be_budgeted">To Be Budgeted</string>
+    <string name="create_category">Create Category</string>
+    <string name="add_budget">Add Budget</string>
+
+    <!-- Accounts Screen -->
+    <string name="checking_account">Checking Account</string>
+    <string name="savings_account">Savings Account</string>
+    <string name="credit_card">Credit Card</string>
+    <string name="add_account">Add Account</string>
+    <string name="manage_accounts">Manage Accounts</string>
+
+    <!-- Transactions Screen -->
+    <string name="add_transaction">Add Transaction</string>
+    <string name="transaction_list">Transaction List</string>
+    <string name="amount">Amount</string>
+    <string name="category">Category</string>
+    <string name="account">Account</string>
+    <string name="date">Date</string>
+    <string name="save">Save</string>
+    <string name="pending">Pending</string>
+    <string name="reconciled">Reconciled</string>
+
+    <!-- Cash Flow -->
+    <string name="cash_flow_analysis">Cash Flow Analysis</string>
+    <string name="cash_flow_forecast">Cash Flow Forecast</string>
+    <string name="weekly_cash_flow">Weekly Cash Flow</string>
+    <string name="cash_flow_warning">Cash Flow Warning</string>
+    <string name="income">Income</string>
+    <string name="expenses">Expenses</string>
+    <string name="total_income">Total Income</string>
+    <string name="total_expenses">Total Expenses</string>
+    <string name="income_vs_expenses">Income vs. Expenses</string>
+    <string name="last_6_months">Last 6 Months</string>
+
+    <!-- Bills -->
+    <string name="upcoming_bills">Upcoming Bills</string>
+    <string name="upcoming_income">Upcoming Income</string>
+    <string name="cash_balance">Cash Balance</string>
+    <string name="safe_zone">Safe Zone</string>
+    <string name="low_balance_projection">Low Balance Projection</string>
+
+    <!-- Warnings -->
+    <string name="low_cash_forecast">Low Cash Forecast</string>
+    <string name="balance_at_risk">Expected cash balance is at risk of running out.</string>
+
+    <!-- General -->
+    <string name="summary">Summary</string>
+    <string name="total">Total</string>
+    <string name="upcoming">Upcoming</string>
+    <string name="bills">Bills</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_bills">Bill Reminders</string>
+    <string name="notification_channel_bills_desc">Notifications for upcoming bills</string>
+    <string name="notification_channel_balance">Balance Alerts</string>
+    <string name="notification_channel_balance_desc">Low balance warnings</string>
+</resources>
