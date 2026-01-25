@@ -10,6 +10,7 @@ import com.buddga.ui.screens.bills.UpcomingBillsViewModel_HiltModules;
 import com.buddga.ui.screens.budgeting.AddBudgetViewModel_HiltModules;
 import com.buddga.ui.screens.budgeting.BudgetingViewModel_HiltModules;
 import com.buddga.ui.screens.cashflow.CashFlowViewModel_HiltModules;
+import com.buddga.ui.screens.categories.AddCategoryViewModel_HiltModules;
 import com.buddga.ui.screens.forecast.CashFlowForecastViewModel_HiltModules;
 import com.buddga.ui.screens.transactions.AddTransactionViewModel_HiltModules;
 import com.buddga.ui.screens.transactions.TransactionsViewModel_HiltModules;
@@ -172,6 +173,7 @@ public final class BudgetApplication_HiltComponents {
           AccountsViewModel_HiltModules.KeyModule.class,
           AddBillViewModel_HiltModules.KeyModule.class,
           AddBudgetViewModel_HiltModules.KeyModule.class,
+          AddCategoryViewModel_HiltModules.KeyModule.class,
           AddTransactionViewModel_HiltModules.KeyModule.class,
           ActivityCBuilderModule.class,
           ViewModelCBuilderModule.class,
@@ -222,6 +224,7 @@ public final class BudgetApplication_HiltComponents {
           AccountsViewModel_HiltModules.BindsModule.class,
           AddBillViewModel_HiltModules.BindsModule.class,
           AddBudgetViewModel_HiltModules.BindsModule.class,
+          AddCategoryViewModel_HiltModules.BindsModule.class,
           AddTransactionViewModel_HiltModules.BindsModule.class,
           BudgetingViewModel_HiltModules.BindsModule.class,
           CashFlowForecastViewModel_HiltModules.BindsModule.class,

@@ -39,6 +39,8 @@ import com.buddga.ui.screens.budgeting.BudgetingViewModel;
 import com.buddga.ui.screens.budgeting.BudgetingViewModel_HiltModules_KeyModule_ProvideFactory;
 import com.buddga.ui.screens.cashflow.CashFlowViewModel;
 import com.buddga.ui.screens.cashflow.CashFlowViewModel_HiltModules_KeyModule_ProvideFactory;
+import com.buddga.ui.screens.categories.AddCategoryViewModel;
+import com.buddga.ui.screens.categories.AddCategoryViewModel_HiltModules_KeyModule_ProvideFactory;
 import com.buddga.ui.screens.forecast.CashFlowForecastViewModel;
 import com.buddga.ui.screens.forecast.CashFlowForecastViewModel_HiltModules_KeyModule_ProvideFactory;
 import com.buddga.ui.screens.transactions.AddTransactionViewModel;
@@ -406,7 +408,7 @@ public final class DaggerBudgetApplication_HiltComponents_SingletonC {
 
     @Override
     public Set<String> getViewModelKeys() {
-      return SetBuilder.<String>newSetBuilder(11).add(AccountsViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(AddBillViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(AddBudgetViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(AddTransactionViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(BudgetingViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(CashFlowForecastViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(CashFlowViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(CashFlowWarningViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(TransactionsViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(UpcomingBillsViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(WeeklyCashFlowViewModel_HiltModules_KeyModule_ProvideFactory.provide()).build();
+      return SetBuilder.<String>newSetBuilder(12).add(AccountsViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(AddBillViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(AddBudgetViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(AddCategoryViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(AddTransactionViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(BudgetingViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(CashFlowForecastViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(CashFlowViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(CashFlowWarningViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(TransactionsViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(UpcomingBillsViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(WeeklyCashFlowViewModel_HiltModules_KeyModule_ProvideFactory.provide()).build();
     }
 
     @Override
@@ -437,6 +439,8 @@ public final class DaggerBudgetApplication_HiltComponents_SingletonC {
     private Provider<AddBillViewModel> addBillViewModelProvider;
 
     private Provider<AddBudgetViewModel> addBudgetViewModelProvider;
+
+    private Provider<AddCategoryViewModel> addCategoryViewModelProvider;
 
     private Provider<AddTransactionViewModel> addTransactionViewModelProvider;
 
@@ -470,19 +474,20 @@ public final class DaggerBudgetApplication_HiltComponents_SingletonC {
       this.accountsViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 0);
       this.addBillViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 1);
       this.addBudgetViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 2);
-      this.addTransactionViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 3);
-      this.budgetingViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 4);
-      this.cashFlowForecastViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 5);
-      this.cashFlowViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 6);
-      this.cashFlowWarningViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 7);
-      this.transactionsViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 8);
-      this.upcomingBillsViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 9);
-      this.weeklyCashFlowViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 10);
+      this.addCategoryViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 3);
+      this.addTransactionViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 4);
+      this.budgetingViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 5);
+      this.cashFlowForecastViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 6);
+      this.cashFlowViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 7);
+      this.cashFlowWarningViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 8);
+      this.transactionsViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 9);
+      this.upcomingBillsViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 10);
+      this.weeklyCashFlowViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 11);
     }
 
     @Override
     public Map<String, javax.inject.Provider<ViewModel>> getHiltViewModelMap() {
-      return MapBuilder.<String, javax.inject.Provider<ViewModel>>newMapBuilder(11).put("com.buddga.ui.screens.accounts.AccountsViewModel", ((Provider) accountsViewModelProvider)).put("com.buddga.ui.screens.bills.AddBillViewModel", ((Provider) addBillViewModelProvider)).put("com.buddga.ui.screens.budgeting.AddBudgetViewModel", ((Provider) addBudgetViewModelProvider)).put("com.buddga.ui.screens.transactions.AddTransactionViewModel", ((Provider) addTransactionViewModelProvider)).put("com.buddga.ui.screens.budgeting.BudgetingViewModel", ((Provider) budgetingViewModelProvider)).put("com.buddga.ui.screens.forecast.CashFlowForecastViewModel", ((Provider) cashFlowForecastViewModelProvider)).put("com.buddga.ui.screens.cashflow.CashFlowViewModel", ((Provider) cashFlowViewModelProvider)).put("com.buddga.ui.screens.warning.CashFlowWarningViewModel", ((Provider) cashFlowWarningViewModelProvider)).put("com.buddga.ui.screens.transactions.TransactionsViewModel", ((Provider) transactionsViewModelProvider)).put("com.buddga.ui.screens.bills.UpcomingBillsViewModel", ((Provider) upcomingBillsViewModelProvider)).put("com.buddga.ui.screens.weekly.WeeklyCashFlowViewModel", ((Provider) weeklyCashFlowViewModelProvider)).build();
+      return MapBuilder.<String, javax.inject.Provider<ViewModel>>newMapBuilder(12).put("com.buddga.ui.screens.accounts.AccountsViewModel", ((Provider) accountsViewModelProvider)).put("com.buddga.ui.screens.bills.AddBillViewModel", ((Provider) addBillViewModelProvider)).put("com.buddga.ui.screens.budgeting.AddBudgetViewModel", ((Provider) addBudgetViewModelProvider)).put("com.buddga.ui.screens.categories.AddCategoryViewModel", ((Provider) addCategoryViewModelProvider)).put("com.buddga.ui.screens.transactions.AddTransactionViewModel", ((Provider) addTransactionViewModelProvider)).put("com.buddga.ui.screens.budgeting.BudgetingViewModel", ((Provider) budgetingViewModelProvider)).put("com.buddga.ui.screens.forecast.CashFlowForecastViewModel", ((Provider) cashFlowForecastViewModelProvider)).put("com.buddga.ui.screens.cashflow.CashFlowViewModel", ((Provider) cashFlowViewModelProvider)).put("com.buddga.ui.screens.warning.CashFlowWarningViewModel", ((Provider) cashFlowWarningViewModelProvider)).put("com.buddga.ui.screens.transactions.TransactionsViewModel", ((Provider) transactionsViewModelProvider)).put("com.buddga.ui.screens.bills.UpcomingBillsViewModel", ((Provider) upcomingBillsViewModelProvider)).put("com.buddga.ui.screens.weekly.WeeklyCashFlowViewModel", ((Provider) weeklyCashFlowViewModelProvider)).build();
     }
 
     @Override
@@ -520,28 +525,31 @@ public final class DaggerBudgetApplication_HiltComponents_SingletonC {
           case 2: // com.buddga.ui.screens.budgeting.AddBudgetViewModel 
           return (T) new AddBudgetViewModel(singletonCImpl.budgetRepositoryImplProvider.get(), singletonCImpl.categoryRepositoryImplProvider.get());
 
-          case 3: // com.buddga.ui.screens.transactions.AddTransactionViewModel 
+          case 3: // com.buddga.ui.screens.categories.AddCategoryViewModel 
+          return (T) new AddCategoryViewModel(singletonCImpl.categoryRepositoryImplProvider.get());
+
+          case 4: // com.buddga.ui.screens.transactions.AddTransactionViewModel 
           return (T) new AddTransactionViewModel(singletonCImpl.transactionRepositoryImplProvider.get(), singletonCImpl.categoryRepositoryImplProvider.get(), singletonCImpl.accountRepositoryImplProvider.get());
 
-          case 4: // com.buddga.ui.screens.budgeting.BudgetingViewModel 
+          case 5: // com.buddga.ui.screens.budgeting.BudgetingViewModel 
           return (T) new BudgetingViewModel(singletonCImpl.budgetRepositoryImplProvider.get(), singletonCImpl.categoryRepositoryImplProvider.get(), singletonCImpl.transactionRepositoryImplProvider.get(), singletonCImpl.accountRepositoryImplProvider.get());
 
-          case 5: // com.buddga.ui.screens.forecast.CashFlowForecastViewModel 
+          case 6: // com.buddga.ui.screens.forecast.CashFlowForecastViewModel 
           return (T) new CashFlowForecastViewModel();
 
-          case 6: // com.buddga.ui.screens.cashflow.CashFlowViewModel 
+          case 7: // com.buddga.ui.screens.cashflow.CashFlowViewModel 
           return (T) new CashFlowViewModel(singletonCImpl.transactionRepositoryImplProvider.get());
 
-          case 7: // com.buddga.ui.screens.warning.CashFlowWarningViewModel 
+          case 8: // com.buddga.ui.screens.warning.CashFlowWarningViewModel 
           return (T) new CashFlowWarningViewModel();
 
-          case 8: // com.buddga.ui.screens.transactions.TransactionsViewModel 
+          case 9: // com.buddga.ui.screens.transactions.TransactionsViewModel 
           return (T) new TransactionsViewModel(singletonCImpl.transactionRepositoryImplProvider.get(), singletonCImpl.accountRepositoryImplProvider.get());
 
-          case 9: // com.buddga.ui.screens.bills.UpcomingBillsViewModel 
+          case 10: // com.buddga.ui.screens.bills.UpcomingBillsViewModel 
           return (T) new UpcomingBillsViewModel();
 
-          case 10: // com.buddga.ui.screens.weekly.WeeklyCashFlowViewModel 
+          case 11: // com.buddga.ui.screens.weekly.WeeklyCashFlowViewModel 
           return (T) new WeeklyCashFlowViewModel();
 
           default: throw new AssertionError(id);

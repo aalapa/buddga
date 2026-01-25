@@ -1,11 +1,15 @@
 package com.buddga.ui.navigation
 
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -22,6 +26,7 @@ import com.buddga.ui.screens.bills.UpcomingBillsScreen
 import com.buddga.ui.screens.budgeting.AddBudgetScreen
 import com.buddga.ui.screens.budgeting.BudgetingScreen
 import com.buddga.ui.screens.cashflow.CashFlowScreen
+import com.buddga.ui.screens.categories.AddCategoryScreen
 import com.buddga.ui.screens.forecast.CashFlowForecastScreen
 import com.buddga.ui.screens.transactions.AddTransactionScreen
 import com.buddga.ui.screens.transactions.TransactionsScreen
@@ -42,17 +47,20 @@ fun BudgetNavHost() {
     Scaffold(
         bottomBar = {
             if (showBottomBar) {
-                NavigationBar {
+                NavigationBar(
+                    modifier = Modifier.height(56.dp)
+                ) {
                     Screen.bottomNavItems.forEach { screen ->
                         val selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
                         NavigationBarItem(
                             icon = {
                                 Icon(
                                     imageVector = if (selected) screen.selectedIcon else screen.unselectedIcon,
-                                    contentDescription = screen.title
+                                    contentDescription = screen.title,
+                                    modifier = Modifier.size(24.dp)
                                 )
                             },
-                            label = { Text(screen.title) },
+                            label = null,
                             selected = selected,
                             onClick = {
                                 navController.navigate(screen.route) {
@@ -71,7 +79,7 @@ fun BudgetNavHost() {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Screen.Budgeting.route,
+            startDestination = Screen.Accounts.route,
             modifier = Modifier.padding(innerPadding)
         ) {
             // Main bottom nav screens
@@ -79,6 +87,9 @@ fun BudgetNavHost() {
                 BudgetingScreen(
                     onNavigateToAddBudget = {
                         navController.navigate(Screen.AddBudget.route)
+                    },
+                    onNavigateToAddCategory = {
+                        navController.navigate(Screen.AddCategory.route)
                     }
                 )
             }
@@ -163,6 +174,12 @@ fun BudgetNavHost() {
 
             composable(Screen.AddBill.route) {
                 AddBillScreen(
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
+
+            composable(Screen.AddCategory.route) {
+                AddCategoryScreen(
                     onNavigateBack = { navController.popBackStack() }
                 )
             }

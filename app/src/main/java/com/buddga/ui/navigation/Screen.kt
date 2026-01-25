@@ -102,7 +102,14 @@ sealed class Screen(
         unselectedIcon = Icons.Outlined.Receipt
     )
 
+    data object AddCategory : Screen(
+        route = "categories/add",
+        title = "Create Category",
+        selectedIcon = Icons.Filled.PieChart,
+        unselectedIcon = Icons.Outlined.PieChart
+    )
+
     companion object {
-        val bottomNavItems = listOf(Budgeting, Accounts, Transactions, CashFlow)
+        val bottomNavItems = listOf(Accounts, Budgeting, Transactions, CashFlow)
     }
 }
