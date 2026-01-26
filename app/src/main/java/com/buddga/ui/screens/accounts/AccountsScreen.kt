@@ -1,6 +1,7 @@
 package com.buddga.ui.screens.accounts
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,11 +10,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,20 +25,22 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.buddga.domain.model.Account
 import com.buddga.domain.model.AccountType
 import com.buddga.ui.components.AccountCard
-import com.buddga.ui.components.AccountSummaryCard
+import java.math.BigDecimal
+import java.text.NumberFormat
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,6 +49,10 @@ fun AccountsScreen(
     viewModel: AccountsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val currencyFormat = remember { NumberFormat.getCurrencyInstance(Locale.US) }
+    
+    // Track expanded/collapsed state for each category (default: collapsed)
+    val expandedCategories = remember { mutableStateMapOf<String, Boolean>() }
 
     // Group accounts by type
     val checkingAccounts = uiState.accounts.filter { it.type == AccountType.CHECKING }
@@ -57,14 +66,15 @@ fun AccountsScreen(
 
     Scaffold(
         topBar = {
-            // Compact header
+            // Compact header with total balance
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp)
                     .background(MaterialTheme.colorScheme.primary)
                     .padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
                     text = "Accounts",
@@ -72,6 +82,21 @@ fun AccountsScreen(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onPrimary
                 )
+                Column(
+                    horizontalAlignment = Alignment.End
+                ) {
+                    Text(
+                        text = currencyFormat.format(uiState.totalBalance),
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                    Text(
+                        text = "${uiState.accountCount} accounts",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
+                    )
+                }
             }
         },
         floatingActionButton = {
@@ -98,64 +123,99 @@ fun AccountsScreen(
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
-            // Total Balance Summary
-            item {
-                AccountSummaryCard(
-                    title = "Total Balance",
-                    balance = uiState.totalBalance,
-                    accountCount = uiState.accountCount
-                )
-            }
-
             // Checking Accounts
             if (checkingAccounts.isNotEmpty()) {
                 item {
-                    AccountGroupHeader(title = "Checking")
-                }
-                items(checkingAccounts) { account ->
-                    AccountCard(
-                        account = account,
-                        onClick = { /* TODO: Navigate to account details */ }
+                    val isExpanded = expandedCategories.getOrDefault("Checking", false)
+                    CollapsibleAccountGroupHeader(
+                        title = "Checking",
+                        accounts = checkingAccounts,
+                        isExpanded = isExpanded,
+                        currencyFormat = currencyFormat,
+                        onToggle = { 
+                            expandedCategories["Checking"] = !isExpanded
+                        }
                     )
+                }
+                if (checkingAccounts.size == 1 || expandedCategories.getOrDefault("Checking", false)) {
+                    items(checkingAccounts) { account ->
+                        AccountCard(
+                            account = account,
+                            onClick = { /* TODO: Navigate to account details */ }
+                        )
+                    }
                 }
             }
 
             // Savings Accounts
             if (savingsAccounts.isNotEmpty()) {
                 item {
-                    AccountGroupHeader(title = "Savings")
-                }
-                items(savingsAccounts) { account ->
-                    AccountCard(
-                        account = account,
-                        onClick = { /* TODO: Navigate to account details */ }
+                    val isExpanded = expandedCategories.getOrDefault("Savings", false)
+                    CollapsibleAccountGroupHeader(
+                        title = "Savings",
+                        accounts = savingsAccounts,
+                        isExpanded = isExpanded,
+                        currencyFormat = currencyFormat,
+                        onToggle = { 
+                            expandedCategories["Savings"] = !isExpanded
+                        }
                     )
+                }
+                if (savingsAccounts.size == 1 || expandedCategories.getOrDefault("Savings", false)) {
+                    items(savingsAccounts) { account ->
+                        AccountCard(
+                            account = account,
+                            onClick = { /* TODO: Navigate to account details */ }
+                        )
+                    }
                 }
             }
 
             // Credit Cards
             if (creditAccounts.isNotEmpty()) {
                 item {
-                    AccountGroupHeader(title = "Credit Cards")
-                }
-                items(creditAccounts) { account ->
-                    AccountCard(
-                        account = account,
-                        onClick = { /* TODO: Navigate to account details */ }
+                    val isExpanded = expandedCategories.getOrDefault("Credit Cards", false)
+                    CollapsibleAccountGroupHeader(
+                        title = "Credit Cards",
+                        accounts = creditAccounts,
+                        isExpanded = isExpanded,
+                        currencyFormat = currencyFormat,
+                        onToggle = { 
+                            expandedCategories["Credit Cards"] = !isExpanded
+                        }
                     )
+                }
+                if (creditAccounts.size == 1 || expandedCategories.getOrDefault("Credit Cards", false)) {
+                    items(creditAccounts) { account ->
+                        AccountCard(
+                            account = account,
+                            onClick = { /* TODO: Navigate to account details */ }
+                        )
+                    }
                 }
             }
 
             // Other Accounts
             if (otherAccounts.isNotEmpty()) {
                 item {
-                    AccountGroupHeader(title = "Other")
-                }
-                items(otherAccounts) { account ->
-                    AccountCard(
-                        account = account,
-                        onClick = { /* TODO: Navigate to account details */ }
+                    val isExpanded = expandedCategories.getOrDefault("Other", false)
+                    CollapsibleAccountGroupHeader(
+                        title = "Other",
+                        accounts = otherAccounts,
+                        isExpanded = isExpanded,
+                        currencyFormat = currencyFormat,
+                        onToggle = { 
+                            expandedCategories["Other"] = !isExpanded
+                        }
                     )
+                }
+                if (otherAccounts.size == 1 || expandedCategories.getOrDefault("Other", false)) {
+                    items(otherAccounts) { account ->
+                        AccountCard(
+                            account = account,
+                            onClick = { /* TODO: Navigate to account details */ }
+                        )
+                    }
                 }
             }
 
@@ -190,33 +250,6 @@ fun AccountsScreen(
                 }
             }
 
-            // Action Buttons
-            item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    TextButton(onClick = onNavigateToAddAccount) {
-                        Icon(
-                            Icons.Default.Add,
-                            contentDescription = null,
-                            modifier = Modifier.padding(end = 4.dp)
-                        )
-                        Text("Add Account")
-                    }
-                    TextButton(onClick = { /* TODO: Manage accounts */ }) {
-                        Icon(
-                            Icons.Default.Settings,
-                            contentDescription = null,
-                            modifier = Modifier.padding(end = 4.dp)
-                        )
-                        Text("Manage Accounts")
-                    }
-                }
-            }
-
             item {
                 Spacer(modifier = Modifier.height(80.dp)) // Space for FAB
             }
@@ -225,15 +258,54 @@ fun AccountsScreen(
 }
 
 @Composable
-private fun AccountGroupHeader(
+private fun CollapsibleAccountGroupHeader(
     title: String,
+    accounts: List<Account>,
+    isExpanded: Boolean,
+    currencyFormat: NumberFormat,
+    onToggle: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Text(
-        text = title,
-        style = MaterialTheme.typography.titleSmall,
-        fontWeight = FontWeight.SemiBold,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = modifier.padding(top = 8.dp, bottom = 4.dp)
-    )
+    val hasMultipleAccounts = accounts.size > 1
+    val totalBalance = accounts.fold(BigDecimal.ZERO) { sum, account -> sum + account.balance }
+    
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(enabled = hasMultipleAccounts) { onToggle() }
+            .padding(top = 8.dp, bottom = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            if (hasMultipleAccounts) {
+                Icon(
+                    imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                    contentDescription = if (isExpanded) "Collapse" else "Expand",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier
+                        .padding(start = 4.dp)
+                        .size(20.dp)
+                )
+            }
+        }
+        
+        // Show total when collapsed and has multiple accounts
+        if (hasMultipleAccounts && !isExpanded) {
+            Text(
+                text = currencyFormat.format(totalBalance),
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
 }
