@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.buddga.domain.model.Account
 import com.buddga.domain.model.Category
+import com.buddga.domain.model.RecurrenceFrequency
 import com.buddga.domain.model.Transaction
 import com.buddga.domain.model.TransactionType
 import com.buddga.domain.repository.AccountRepository
@@ -56,9 +57,17 @@ class AddTransactionViewModel @Inject constructor(
         accountId: Long,
         payee: String,
         memo: String,
-        date: LocalDate
+        date: LocalDate,
+        isRecurring: Boolean = false,
+        recurrenceFrequency: RecurrenceFrequency? = null
     ) {
         viewModelScope.launch {
+            val nextOccurrenceDate = if (isRecurring && recurrenceFrequency != null) {
+                calculateNextOccurrence(date, recurrenceFrequency)
+            } else {
+                null
+            }
+            
             val transaction = Transaction(
                 amount = amount,
                 type = type,
@@ -68,9 +77,23 @@ class AddTransactionViewModel @Inject constructor(
                 memo = memo,
                 date = date,
                 createdAt = LocalDateTime.now(),
-                updatedAt = LocalDateTime.now()
+                updatedAt = LocalDateTime.now(),
+                isRecurring = isRecurring,
+                recurrenceFrequency = recurrenceFrequency,
+                nextOccurrenceDate = nextOccurrenceDate,
+                isPending = false
             )
             transactionRepository.addTransaction(transaction)
+        }
+    }
+    
+    private fun calculateNextOccurrence(date: LocalDate, frequency: RecurrenceFrequency): LocalDate {
+        return when (frequency) {
+            RecurrenceFrequency.WEEKLY -> date.plusWeeks(1)
+            RecurrenceFrequency.BIWEEKLY -> date.plusWeeks(2)
+            RecurrenceFrequency.MONTHLY -> date.plusMonths(1)
+            RecurrenceFrequency.QUARTERLY -> date.plusMonths(3)
+            RecurrenceFrequency.YEARLY -> date.plusYears(1)
         }
     }
 }

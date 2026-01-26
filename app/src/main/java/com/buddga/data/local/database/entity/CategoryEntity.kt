@@ -11,6 +11,7 @@ data class CategoryEntity(
     val color: Long,
     val icon: String,
     val groupName: String,
+    val type: String = "EXPENSE", // "INCOME" or "EXPENSE"
     val sortOrder: Int = 0,
     val isHidden: Boolean = false
 )

@@ -53,7 +53,7 @@ public final class TransactionDao_Impl implements TransactionDao {
       @Override
       @NonNull
       protected String createQuery() {
-        return "INSERT OR REPLACE INTO `transactions` (`id`,`amount`,`type`,`categoryId`,`accountId`,`toAccountId`,`payee`,`memo`,`date`,`isReconciled`,`isCleared`,`createdAt`,`updatedAt`) VALUES (nullif(?, 0),?,?,?,?,?,?,?,?,?,?,?,?)";
+        return "INSERT OR REPLACE INTO `transactions` (`id`,`amount`,`type`,`categoryId`,`accountId`,`toAccountId`,`payee`,`memo`,`date`,`isReconciled`,`isCleared`,`isPending`,`isRecurring`,`recurrenceFrequency`,`nextOccurrenceDate`,`parentTransactionId`,`createdAt`,`updatedAt`) VALUES (nullif(?, 0),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
       }
 
       @Override
@@ -80,8 +80,27 @@ public final class TransactionDao_Impl implements TransactionDao {
         statement.bindLong(10, _tmp);
         final int _tmp_1 = entity.isCleared() ? 1 : 0;
         statement.bindLong(11, _tmp_1);
-        statement.bindLong(12, entity.getCreatedAt());
-        statement.bindLong(13, entity.getUpdatedAt());
+        final int _tmp_2 = entity.isPending() ? 1 : 0;
+        statement.bindLong(12, _tmp_2);
+        final int _tmp_3 = entity.isRecurring() ? 1 : 0;
+        statement.bindLong(13, _tmp_3);
+        if (entity.getRecurrenceFrequency() == null) {
+          statement.bindNull(14);
+        } else {
+          statement.bindString(14, entity.getRecurrenceFrequency());
+        }
+        if (entity.getNextOccurrenceDate() == null) {
+          statement.bindNull(15);
+        } else {
+          statement.bindLong(15, entity.getNextOccurrenceDate());
+        }
+        if (entity.getParentTransactionId() == null) {
+          statement.bindNull(16);
+        } else {
+          statement.bindLong(16, entity.getParentTransactionId());
+        }
+        statement.bindLong(17, entity.getCreatedAt());
+        statement.bindLong(18, entity.getUpdatedAt());
       }
     };
     this.__deletionAdapterOfTransactionEntity = new EntityDeletionOrUpdateAdapter<TransactionEntity>(__db) {
@@ -101,7 +120,7 @@ public final class TransactionDao_Impl implements TransactionDao {
       @Override
       @NonNull
       protected String createQuery() {
-        return "UPDATE OR ABORT `transactions` SET `id` = ?,`amount` = ?,`type` = ?,`categoryId` = ?,`accountId` = ?,`toAccountId` = ?,`payee` = ?,`memo` = ?,`date` = ?,`isReconciled` = ?,`isCleared` = ?,`createdAt` = ?,`updatedAt` = ? WHERE `id` = ?";
+        return "UPDATE OR ABORT `transactions` SET `id` = ?,`amount` = ?,`type` = ?,`categoryId` = ?,`accountId` = ?,`toAccountId` = ?,`payee` = ?,`memo` = ?,`date` = ?,`isReconciled` = ?,`isCleared` = ?,`isPending` = ?,`isRecurring` = ?,`recurrenceFrequency` = ?,`nextOccurrenceDate` = ?,`parentTransactionId` = ?,`createdAt` = ?,`updatedAt` = ? WHERE `id` = ?";
       }
 
       @Override
@@ -128,9 +147,28 @@ public final class TransactionDao_Impl implements TransactionDao {
         statement.bindLong(10, _tmp);
         final int _tmp_1 = entity.isCleared() ? 1 : 0;
         statement.bindLong(11, _tmp_1);
-        statement.bindLong(12, entity.getCreatedAt());
-        statement.bindLong(13, entity.getUpdatedAt());
-        statement.bindLong(14, entity.getId());
+        final int _tmp_2 = entity.isPending() ? 1 : 0;
+        statement.bindLong(12, _tmp_2);
+        final int _tmp_3 = entity.isRecurring() ? 1 : 0;
+        statement.bindLong(13, _tmp_3);
+        if (entity.getRecurrenceFrequency() == null) {
+          statement.bindNull(14);
+        } else {
+          statement.bindString(14, entity.getRecurrenceFrequency());
+        }
+        if (entity.getNextOccurrenceDate() == null) {
+          statement.bindNull(15);
+        } else {
+          statement.bindLong(15, entity.getNextOccurrenceDate());
+        }
+        if (entity.getParentTransactionId() == null) {
+          statement.bindNull(16);
+        } else {
+          statement.bindLong(16, entity.getParentTransactionId());
+        }
+        statement.bindLong(17, entity.getCreatedAt());
+        statement.bindLong(18, entity.getUpdatedAt());
+        statement.bindLong(19, entity.getId());
       }
     };
     this.__preparedStmtOfUpdateReconciled = new SharedSQLiteStatement(__db) {
@@ -287,8 +325,9 @@ public final class TransactionDao_Impl implements TransactionDao {
   public Flow<List<TransactionWithDetailsEntity>> getAllTransactionsWithDetails() {
     final String _sql = "\n"
             + "        SELECT t.id, t.amount, t.type, t.categoryId, t.accountId, t.payee, t.memo,\n"
-            + "               t.date, t.isReconciled, t.isCleared, c.name as categoryName,\n"
-            + "               c.color as categoryColor, a.name as accountName\n"
+            + "               t.date, t.isReconciled, t.isCleared, t.isPending, t.isRecurring,\n"
+            + "               t.recurrenceFrequency, t.nextOccurrenceDate, t.parentTransactionId,\n"
+            + "               c.name as categoryName, c.color as categoryColor, a.name as accountName\n"
             + "        FROM transactions t\n"
             + "        LEFT JOIN categories c ON t.categoryId = c.id\n"
             + "        INNER JOIN accounts a ON t.accountId = a.id\n"
@@ -312,9 +351,14 @@ public final class TransactionDao_Impl implements TransactionDao {
           final int _cursorIndexOfDate = 7;
           final int _cursorIndexOfIsReconciled = 8;
           final int _cursorIndexOfIsCleared = 9;
-          final int _cursorIndexOfCategoryName = 10;
-          final int _cursorIndexOfCategoryColor = 11;
-          final int _cursorIndexOfAccountName = 12;
+          final int _cursorIndexOfIsPending = 10;
+          final int _cursorIndexOfIsRecurring = 11;
+          final int _cursorIndexOfRecurrenceFrequency = 12;
+          final int _cursorIndexOfNextOccurrenceDate = 13;
+          final int _cursorIndexOfParentTransactionId = 14;
+          final int _cursorIndexOfCategoryName = 15;
+          final int _cursorIndexOfCategoryColor = 16;
+          final int _cursorIndexOfAccountName = 17;
           final List<TransactionWithDetailsEntity> _result = new ArrayList<TransactionWithDetailsEntity>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final TransactionWithDetailsEntity _item;
@@ -346,6 +390,32 @@ public final class TransactionDao_Impl implements TransactionDao {
             final int _tmp_1;
             _tmp_1 = _cursor.getInt(_cursorIndexOfIsCleared);
             _tmpIsCleared = _tmp_1 != 0;
+            final boolean _tmpIsPending;
+            final int _tmp_2;
+            _tmp_2 = _cursor.getInt(_cursorIndexOfIsPending);
+            _tmpIsPending = _tmp_2 != 0;
+            final boolean _tmpIsRecurring;
+            final int _tmp_3;
+            _tmp_3 = _cursor.getInt(_cursorIndexOfIsRecurring);
+            _tmpIsRecurring = _tmp_3 != 0;
+            final String _tmpRecurrenceFrequency;
+            if (_cursor.isNull(_cursorIndexOfRecurrenceFrequency)) {
+              _tmpRecurrenceFrequency = null;
+            } else {
+              _tmpRecurrenceFrequency = _cursor.getString(_cursorIndexOfRecurrenceFrequency);
+            }
+            final Long _tmpNextOccurrenceDate;
+            if (_cursor.isNull(_cursorIndexOfNextOccurrenceDate)) {
+              _tmpNextOccurrenceDate = null;
+            } else {
+              _tmpNextOccurrenceDate = _cursor.getLong(_cursorIndexOfNextOccurrenceDate);
+            }
+            final Long _tmpParentTransactionId;
+            if (_cursor.isNull(_cursorIndexOfParentTransactionId)) {
+              _tmpParentTransactionId = null;
+            } else {
+              _tmpParentTransactionId = _cursor.getLong(_cursorIndexOfParentTransactionId);
+            }
             final String _tmpCategoryName;
             if (_cursor.isNull(_cursorIndexOfCategoryName)) {
               _tmpCategoryName = null;
@@ -360,7 +430,7 @@ public final class TransactionDao_Impl implements TransactionDao {
             }
             final String _tmpAccountName;
             _tmpAccountName = _cursor.getString(_cursorIndexOfAccountName);
-            _item = new TransactionWithDetailsEntity(_tmpId,_tmpAmount,_tmpType,_tmpCategoryId,_tmpAccountId,_tmpPayee,_tmpMemo,_tmpDate,_tmpIsReconciled,_tmpIsCleared,_tmpCategoryName,_tmpCategoryColor,_tmpAccountName);
+            _item = new TransactionWithDetailsEntity(_tmpId,_tmpAmount,_tmpType,_tmpCategoryId,_tmpAccountId,_tmpPayee,_tmpMemo,_tmpDate,_tmpIsReconciled,_tmpIsCleared,_tmpIsPending,_tmpIsRecurring,_tmpRecurrenceFrequency,_tmpNextOccurrenceDate,_tmpParentTransactionId,_tmpCategoryName,_tmpCategoryColor,_tmpAccountName);
             _result.add(_item);
           }
           return _result;
@@ -380,8 +450,9 @@ public final class TransactionDao_Impl implements TransactionDao {
   public Flow<List<TransactionWithDetailsEntity>> getTransactionsByAccount(final long accountId) {
     final String _sql = "\n"
             + "        SELECT t.id, t.amount, t.type, t.categoryId, t.accountId, t.payee, t.memo,\n"
-            + "               t.date, t.isReconciled, t.isCleared, c.name as categoryName,\n"
-            + "               c.color as categoryColor, a.name as accountName\n"
+            + "               t.date, t.isReconciled, t.isCleared, t.isPending, t.isRecurring,\n"
+            + "               t.recurrenceFrequency, t.nextOccurrenceDate, t.parentTransactionId,\n"
+            + "               c.name as categoryName, c.color as categoryColor, a.name as accountName\n"
             + "        FROM transactions t\n"
             + "        LEFT JOIN categories c ON t.categoryId = c.id\n"
             + "        INNER JOIN accounts a ON t.accountId = a.id\n"
@@ -408,9 +479,14 @@ public final class TransactionDao_Impl implements TransactionDao {
           final int _cursorIndexOfDate = 7;
           final int _cursorIndexOfIsReconciled = 8;
           final int _cursorIndexOfIsCleared = 9;
-          final int _cursorIndexOfCategoryName = 10;
-          final int _cursorIndexOfCategoryColor = 11;
-          final int _cursorIndexOfAccountName = 12;
+          final int _cursorIndexOfIsPending = 10;
+          final int _cursorIndexOfIsRecurring = 11;
+          final int _cursorIndexOfRecurrenceFrequency = 12;
+          final int _cursorIndexOfNextOccurrenceDate = 13;
+          final int _cursorIndexOfParentTransactionId = 14;
+          final int _cursorIndexOfCategoryName = 15;
+          final int _cursorIndexOfCategoryColor = 16;
+          final int _cursorIndexOfAccountName = 17;
           final List<TransactionWithDetailsEntity> _result = new ArrayList<TransactionWithDetailsEntity>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final TransactionWithDetailsEntity _item;
@@ -442,6 +518,32 @@ public final class TransactionDao_Impl implements TransactionDao {
             final int _tmp_1;
             _tmp_1 = _cursor.getInt(_cursorIndexOfIsCleared);
             _tmpIsCleared = _tmp_1 != 0;
+            final boolean _tmpIsPending;
+            final int _tmp_2;
+            _tmp_2 = _cursor.getInt(_cursorIndexOfIsPending);
+            _tmpIsPending = _tmp_2 != 0;
+            final boolean _tmpIsRecurring;
+            final int _tmp_3;
+            _tmp_3 = _cursor.getInt(_cursorIndexOfIsRecurring);
+            _tmpIsRecurring = _tmp_3 != 0;
+            final String _tmpRecurrenceFrequency;
+            if (_cursor.isNull(_cursorIndexOfRecurrenceFrequency)) {
+              _tmpRecurrenceFrequency = null;
+            } else {
+              _tmpRecurrenceFrequency = _cursor.getString(_cursorIndexOfRecurrenceFrequency);
+            }
+            final Long _tmpNextOccurrenceDate;
+            if (_cursor.isNull(_cursorIndexOfNextOccurrenceDate)) {
+              _tmpNextOccurrenceDate = null;
+            } else {
+              _tmpNextOccurrenceDate = _cursor.getLong(_cursorIndexOfNextOccurrenceDate);
+            }
+            final Long _tmpParentTransactionId;
+            if (_cursor.isNull(_cursorIndexOfParentTransactionId)) {
+              _tmpParentTransactionId = null;
+            } else {
+              _tmpParentTransactionId = _cursor.getLong(_cursorIndexOfParentTransactionId);
+            }
             final String _tmpCategoryName;
             if (_cursor.isNull(_cursorIndexOfCategoryName)) {
               _tmpCategoryName = null;
@@ -456,7 +558,7 @@ public final class TransactionDao_Impl implements TransactionDao {
             }
             final String _tmpAccountName;
             _tmpAccountName = _cursor.getString(_cursorIndexOfAccountName);
-            _item = new TransactionWithDetailsEntity(_tmpId,_tmpAmount,_tmpType,_tmpCategoryId,_tmpAccountId,_tmpPayee,_tmpMemo,_tmpDate,_tmpIsReconciled,_tmpIsCleared,_tmpCategoryName,_tmpCategoryColor,_tmpAccountName);
+            _item = new TransactionWithDetailsEntity(_tmpId,_tmpAmount,_tmpType,_tmpCategoryId,_tmpAccountId,_tmpPayee,_tmpMemo,_tmpDate,_tmpIsReconciled,_tmpIsCleared,_tmpIsPending,_tmpIsRecurring,_tmpRecurrenceFrequency,_tmpNextOccurrenceDate,_tmpParentTransactionId,_tmpCategoryName,_tmpCategoryColor,_tmpAccountName);
             _result.add(_item);
           }
           return _result;
@@ -477,8 +579,9 @@ public final class TransactionDao_Impl implements TransactionDao {
       final long endDate) {
     final String _sql = "\n"
             + "        SELECT t.id, t.amount, t.type, t.categoryId, t.accountId, t.payee, t.memo,\n"
-            + "               t.date, t.isReconciled, t.isCleared, c.name as categoryName,\n"
-            + "               c.color as categoryColor, a.name as accountName\n"
+            + "               t.date, t.isReconciled, t.isCleared, t.isPending, t.isRecurring,\n"
+            + "               t.recurrenceFrequency, t.nextOccurrenceDate, t.parentTransactionId,\n"
+            + "               c.name as categoryName, c.color as categoryColor, a.name as accountName\n"
             + "        FROM transactions t\n"
             + "        LEFT JOIN categories c ON t.categoryId = c.id\n"
             + "        INNER JOIN accounts a ON t.accountId = a.id\n"
@@ -507,9 +610,14 @@ public final class TransactionDao_Impl implements TransactionDao {
           final int _cursorIndexOfDate = 7;
           final int _cursorIndexOfIsReconciled = 8;
           final int _cursorIndexOfIsCleared = 9;
-          final int _cursorIndexOfCategoryName = 10;
-          final int _cursorIndexOfCategoryColor = 11;
-          final int _cursorIndexOfAccountName = 12;
+          final int _cursorIndexOfIsPending = 10;
+          final int _cursorIndexOfIsRecurring = 11;
+          final int _cursorIndexOfRecurrenceFrequency = 12;
+          final int _cursorIndexOfNextOccurrenceDate = 13;
+          final int _cursorIndexOfParentTransactionId = 14;
+          final int _cursorIndexOfCategoryName = 15;
+          final int _cursorIndexOfCategoryColor = 16;
+          final int _cursorIndexOfAccountName = 17;
           final List<TransactionWithDetailsEntity> _result = new ArrayList<TransactionWithDetailsEntity>(_cursor.getCount());
           while (_cursor.moveToNext()) {
             final TransactionWithDetailsEntity _item;
@@ -541,6 +649,32 @@ public final class TransactionDao_Impl implements TransactionDao {
             final int _tmp_1;
             _tmp_1 = _cursor.getInt(_cursorIndexOfIsCleared);
             _tmpIsCleared = _tmp_1 != 0;
+            final boolean _tmpIsPending;
+            final int _tmp_2;
+            _tmp_2 = _cursor.getInt(_cursorIndexOfIsPending);
+            _tmpIsPending = _tmp_2 != 0;
+            final boolean _tmpIsRecurring;
+            final int _tmp_3;
+            _tmp_3 = _cursor.getInt(_cursorIndexOfIsRecurring);
+            _tmpIsRecurring = _tmp_3 != 0;
+            final String _tmpRecurrenceFrequency;
+            if (_cursor.isNull(_cursorIndexOfRecurrenceFrequency)) {
+              _tmpRecurrenceFrequency = null;
+            } else {
+              _tmpRecurrenceFrequency = _cursor.getString(_cursorIndexOfRecurrenceFrequency);
+            }
+            final Long _tmpNextOccurrenceDate;
+            if (_cursor.isNull(_cursorIndexOfNextOccurrenceDate)) {
+              _tmpNextOccurrenceDate = null;
+            } else {
+              _tmpNextOccurrenceDate = _cursor.getLong(_cursorIndexOfNextOccurrenceDate);
+            }
+            final Long _tmpParentTransactionId;
+            if (_cursor.isNull(_cursorIndexOfParentTransactionId)) {
+              _tmpParentTransactionId = null;
+            } else {
+              _tmpParentTransactionId = _cursor.getLong(_cursorIndexOfParentTransactionId);
+            }
             final String _tmpCategoryName;
             if (_cursor.isNull(_cursorIndexOfCategoryName)) {
               _tmpCategoryName = null;
@@ -555,7 +689,7 @@ public final class TransactionDao_Impl implements TransactionDao {
             }
             final String _tmpAccountName;
             _tmpAccountName = _cursor.getString(_cursorIndexOfAccountName);
-            _item = new TransactionWithDetailsEntity(_tmpId,_tmpAmount,_tmpType,_tmpCategoryId,_tmpAccountId,_tmpPayee,_tmpMemo,_tmpDate,_tmpIsReconciled,_tmpIsCleared,_tmpCategoryName,_tmpCategoryColor,_tmpAccountName);
+            _item = new TransactionWithDetailsEntity(_tmpId,_tmpAmount,_tmpType,_tmpCategoryId,_tmpAccountId,_tmpPayee,_tmpMemo,_tmpDate,_tmpIsReconciled,_tmpIsCleared,_tmpIsPending,_tmpIsRecurring,_tmpRecurrenceFrequency,_tmpNextOccurrenceDate,_tmpParentTransactionId,_tmpCategoryName,_tmpCategoryColor,_tmpAccountName);
             _result.add(_item);
           }
           return _result;
@@ -596,6 +730,11 @@ public final class TransactionDao_Impl implements TransactionDao {
           final int _cursorIndexOfDate = CursorUtil.getColumnIndexOrThrow(_cursor, "date");
           final int _cursorIndexOfIsReconciled = CursorUtil.getColumnIndexOrThrow(_cursor, "isReconciled");
           final int _cursorIndexOfIsCleared = CursorUtil.getColumnIndexOrThrow(_cursor, "isCleared");
+          final int _cursorIndexOfIsPending = CursorUtil.getColumnIndexOrThrow(_cursor, "isPending");
+          final int _cursorIndexOfIsRecurring = CursorUtil.getColumnIndexOrThrow(_cursor, "isRecurring");
+          final int _cursorIndexOfRecurrenceFrequency = CursorUtil.getColumnIndexOrThrow(_cursor, "recurrenceFrequency");
+          final int _cursorIndexOfNextOccurrenceDate = CursorUtil.getColumnIndexOrThrow(_cursor, "nextOccurrenceDate");
+          final int _cursorIndexOfParentTransactionId = CursorUtil.getColumnIndexOrThrow(_cursor, "parentTransactionId");
           final int _cursorIndexOfCreatedAt = CursorUtil.getColumnIndexOrThrow(_cursor, "createdAt");
           final int _cursorIndexOfUpdatedAt = CursorUtil.getColumnIndexOrThrow(_cursor, "updatedAt");
           final TransactionEntity _result;
@@ -634,11 +773,37 @@ public final class TransactionDao_Impl implements TransactionDao {
             final int _tmp_1;
             _tmp_1 = _cursor.getInt(_cursorIndexOfIsCleared);
             _tmpIsCleared = _tmp_1 != 0;
+            final boolean _tmpIsPending;
+            final int _tmp_2;
+            _tmp_2 = _cursor.getInt(_cursorIndexOfIsPending);
+            _tmpIsPending = _tmp_2 != 0;
+            final boolean _tmpIsRecurring;
+            final int _tmp_3;
+            _tmp_3 = _cursor.getInt(_cursorIndexOfIsRecurring);
+            _tmpIsRecurring = _tmp_3 != 0;
+            final String _tmpRecurrenceFrequency;
+            if (_cursor.isNull(_cursorIndexOfRecurrenceFrequency)) {
+              _tmpRecurrenceFrequency = null;
+            } else {
+              _tmpRecurrenceFrequency = _cursor.getString(_cursorIndexOfRecurrenceFrequency);
+            }
+            final Long _tmpNextOccurrenceDate;
+            if (_cursor.isNull(_cursorIndexOfNextOccurrenceDate)) {
+              _tmpNextOccurrenceDate = null;
+            } else {
+              _tmpNextOccurrenceDate = _cursor.getLong(_cursorIndexOfNextOccurrenceDate);
+            }
+            final Long _tmpParentTransactionId;
+            if (_cursor.isNull(_cursorIndexOfParentTransactionId)) {
+              _tmpParentTransactionId = null;
+            } else {
+              _tmpParentTransactionId = _cursor.getLong(_cursorIndexOfParentTransactionId);
+            }
             final long _tmpCreatedAt;
             _tmpCreatedAt = _cursor.getLong(_cursorIndexOfCreatedAt);
             final long _tmpUpdatedAt;
             _tmpUpdatedAt = _cursor.getLong(_cursorIndexOfUpdatedAt);
-            _result = new TransactionEntity(_tmpId,_tmpAmount,_tmpType,_tmpCategoryId,_tmpAccountId,_tmpToAccountId,_tmpPayee,_tmpMemo,_tmpDate,_tmpIsReconciled,_tmpIsCleared,_tmpCreatedAt,_tmpUpdatedAt);
+            _result = new TransactionEntity(_tmpId,_tmpAmount,_tmpType,_tmpCategoryId,_tmpAccountId,_tmpToAccountId,_tmpPayee,_tmpMemo,_tmpDate,_tmpIsReconciled,_tmpIsCleared,_tmpIsPending,_tmpIsRecurring,_tmpRecurrenceFrequency,_tmpNextOccurrenceDate,_tmpParentTransactionId,_tmpCreatedAt,_tmpUpdatedAt);
           } else {
             _result = null;
           }
@@ -674,6 +839,11 @@ public final class TransactionDao_Impl implements TransactionDao {
           final int _cursorIndexOfDate = CursorUtil.getColumnIndexOrThrow(_cursor, "date");
           final int _cursorIndexOfIsReconciled = CursorUtil.getColumnIndexOrThrow(_cursor, "isReconciled");
           final int _cursorIndexOfIsCleared = CursorUtil.getColumnIndexOrThrow(_cursor, "isCleared");
+          final int _cursorIndexOfIsPending = CursorUtil.getColumnIndexOrThrow(_cursor, "isPending");
+          final int _cursorIndexOfIsRecurring = CursorUtil.getColumnIndexOrThrow(_cursor, "isRecurring");
+          final int _cursorIndexOfRecurrenceFrequency = CursorUtil.getColumnIndexOrThrow(_cursor, "recurrenceFrequency");
+          final int _cursorIndexOfNextOccurrenceDate = CursorUtil.getColumnIndexOrThrow(_cursor, "nextOccurrenceDate");
+          final int _cursorIndexOfParentTransactionId = CursorUtil.getColumnIndexOrThrow(_cursor, "parentTransactionId");
           final int _cursorIndexOfCreatedAt = CursorUtil.getColumnIndexOrThrow(_cursor, "createdAt");
           final int _cursorIndexOfUpdatedAt = CursorUtil.getColumnIndexOrThrow(_cursor, "updatedAt");
           final List<TransactionEntity> _result = new ArrayList<TransactionEntity>(_cursor.getCount());
@@ -713,11 +883,37 @@ public final class TransactionDao_Impl implements TransactionDao {
             final int _tmp_1;
             _tmp_1 = _cursor.getInt(_cursorIndexOfIsCleared);
             _tmpIsCleared = _tmp_1 != 0;
+            final boolean _tmpIsPending;
+            final int _tmp_2;
+            _tmp_2 = _cursor.getInt(_cursorIndexOfIsPending);
+            _tmpIsPending = _tmp_2 != 0;
+            final boolean _tmpIsRecurring;
+            final int _tmp_3;
+            _tmp_3 = _cursor.getInt(_cursorIndexOfIsRecurring);
+            _tmpIsRecurring = _tmp_3 != 0;
+            final String _tmpRecurrenceFrequency;
+            if (_cursor.isNull(_cursorIndexOfRecurrenceFrequency)) {
+              _tmpRecurrenceFrequency = null;
+            } else {
+              _tmpRecurrenceFrequency = _cursor.getString(_cursorIndexOfRecurrenceFrequency);
+            }
+            final Long _tmpNextOccurrenceDate;
+            if (_cursor.isNull(_cursorIndexOfNextOccurrenceDate)) {
+              _tmpNextOccurrenceDate = null;
+            } else {
+              _tmpNextOccurrenceDate = _cursor.getLong(_cursorIndexOfNextOccurrenceDate);
+            }
+            final Long _tmpParentTransactionId;
+            if (_cursor.isNull(_cursorIndexOfParentTransactionId)) {
+              _tmpParentTransactionId = null;
+            } else {
+              _tmpParentTransactionId = _cursor.getLong(_cursorIndexOfParentTransactionId);
+            }
             final long _tmpCreatedAt;
             _tmpCreatedAt = _cursor.getLong(_cursorIndexOfCreatedAt);
             final long _tmpUpdatedAt;
             _tmpUpdatedAt = _cursor.getLong(_cursorIndexOfUpdatedAt);
-            _item = new TransactionEntity(_tmpId,_tmpAmount,_tmpType,_tmpCategoryId,_tmpAccountId,_tmpToAccountId,_tmpPayee,_tmpMemo,_tmpDate,_tmpIsReconciled,_tmpIsCleared,_tmpCreatedAt,_tmpUpdatedAt);
+            _item = new TransactionEntity(_tmpId,_tmpAmount,_tmpType,_tmpCategoryId,_tmpAccountId,_tmpToAccountId,_tmpPayee,_tmpMemo,_tmpDate,_tmpIsReconciled,_tmpIsCleared,_tmpIsPending,_tmpIsRecurring,_tmpRecurrenceFrequency,_tmpNextOccurrenceDate,_tmpParentTransactionId,_tmpCreatedAt,_tmpUpdatedAt);
             _result.add(_item);
           }
           return _result;

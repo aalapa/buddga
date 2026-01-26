@@ -2,6 +2,7 @@ package com.buddga.ui.screens.transactions
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.buddga.domain.model.RecurrenceFrequency
 import com.buddga.domain.model.Transaction
 import com.buddga.domain.model.TransactionType
 import com.buddga.domain.model.TransactionWithDetails
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
@@ -110,5 +112,76 @@ class TransactionsViewModel @Inject constructor(
 
     fun setMonth(month: YearMonth) {
         _selectedMonth.value = month
+    }
+    
+    /**
+     * Approve a pending transaction by marking it as not pending
+     */
+    fun approvePendingTransaction(transactionId: Long) {
+        viewModelScope.launch {
+            val transactions = transactionRepository.getAllTransactions().first()
+            val transaction = transactions.find { it.transaction.id == transactionId }?.transaction
+            
+            transaction?.let {
+                val updatedTransaction = it.copy(
+                    isPending = false,
+                    updatedAt = LocalDateTime.now()
+                )
+                transactionRepository.updateTransaction(updatedTransaction)
+            }
+        }
+    }
+    
+    /**
+     * Skip a pending transaction by moving its date to the next occurrence
+     */
+    fun skipPendingTransaction(transactionId: Long) {
+        viewModelScope.launch {
+            val transactions = transactionRepository.getAllTransactions().first()
+            val transaction = transactions.find { it.transaction.id == transactionId }?.transaction
+            
+            transaction?.let {
+                // If it has a parent (recurring transaction), update the parent's next occurrence
+                if (it.parentTransactionId != null) {
+                    val parentTransaction = transactions.find { t -> 
+                        t.transaction.id == it.parentTransactionId 
+                    }?.transaction
+                    
+                    parentTransaction?.let { parent ->
+                        parent.recurrenceFrequency?.let { frequency ->
+                            val nextOccurrence = calculateNextOccurrence(it.date, frequency)
+                            transactionRepository.updateTransaction(
+                                parent.copy(
+                                    nextOccurrenceDate = nextOccurrence,
+                                    updatedAt = LocalDateTime.now()
+                                )
+                            )
+                        }
+                    }
+                }
+                
+                // Delete the pending transaction
+                transactionRepository.deleteTransaction(transactionId)
+            }
+        }
+    }
+    
+    /**
+     * Delete a pending transaction
+     */
+    fun deletePendingTransaction(transactionId: Long) {
+        viewModelScope.launch {
+            transactionRepository.deleteTransaction(transactionId)
+        }
+    }
+    
+    private fun calculateNextOccurrence(date: LocalDate, frequency: RecurrenceFrequency): LocalDate {
+        return when (frequency) {
+            RecurrenceFrequency.WEEKLY -> date.plusWeeks(1)
+            RecurrenceFrequency.BIWEEKLY -> date.plusWeeks(2)
+            RecurrenceFrequency.MONTHLY -> date.plusMonths(1)
+            RecurrenceFrequency.QUARTERLY -> date.plusMonths(3)
+            RecurrenceFrequency.YEARLY -> date.plusYears(1)
+        }
     }
 }

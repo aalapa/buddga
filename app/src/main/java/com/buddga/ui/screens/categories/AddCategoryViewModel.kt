@@ -17,14 +17,16 @@ class AddCategoryViewModel @Inject constructor(
         name: String,
         color: Long,
         icon: String,
-        groupName: String
+        groupName: String,
+        type: com.buddga.domain.model.CategoryType
     ) {
         viewModelScope.launch {
             val category = Category(
                 name = name,
                 color = color,
                 icon = icon,
-                groupName = groupName
+                groupName = groupName,
+                type = type
             )
             categoryRepository.addCategory(category)
         }

@@ -2,6 +2,7 @@ package com.buddga;
 
 import android.app.Activity;
 import android.app.Service;
+import android.content.Context;
 import android.view.View;
 import androidx.fragment.app.Fragment;
 import androidx.hilt.work.HiltWorkerFactory;
@@ -10,6 +11,7 @@ import androidx.hilt.work.WorkerFactoryModule_ProvideFactoryFactory;
 import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModel;
 import androidx.work.ListenableWorker;
+import androidx.work.WorkerParameters;
 import com.buddga.data.local.database.BudgetDatabase;
 import com.buddga.data.local.database.dao.AccountDao;
 import com.buddga.data.local.database.dao.BillDao;
@@ -51,6 +53,8 @@ import com.buddga.ui.screens.warning.CashFlowWarningViewModel;
 import com.buddga.ui.screens.warning.CashFlowWarningViewModel_HiltModules_KeyModule_ProvideFactory;
 import com.buddga.ui.screens.weekly.WeeklyCashFlowViewModel;
 import com.buddga.ui.screens.weekly.WeeklyCashFlowViewModel_HiltModules_KeyModule_ProvideFactory;
+import com.buddga.worker.RecurringTransactionWorker;
+import com.buddga.worker.RecurringTransactionWorker_AssistedFactory;
 import dagger.hilt.android.ActivityRetainedLifecycle;
 import dagger.hilt.android.ViewModelLifecycle;
 import dagger.hilt.android.internal.builders.ActivityComponentBuilder;
@@ -72,6 +76,7 @@ import dagger.internal.MapBuilder;
 import dagger.internal.Preconditions;
 import dagger.internal.Provider;
 import dagger.internal.SetBuilder;
+import dagger.internal.SingleCheck;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -634,6 +639,12 @@ public final class DaggerBudgetApplication_HiltComponents_SingletonC {
 
     private Provider<BudgetDatabase> provideBudgetDatabaseProvider;
 
+    private Provider<TransactionDao> provideTransactionDaoProvider;
+
+    private Provider<TransactionRepositoryImpl> transactionRepositoryImplProvider;
+
+    private Provider<RecurringTransactionWorker_AssistedFactory> recurringTransactionWorker_AssistedFactoryProvider;
+
     private Provider<AccountDao> provideAccountDaoProvider;
 
     private Provider<AccountRepositoryImpl> accountRepositoryImplProvider;
@@ -650,33 +661,35 @@ public final class DaggerBudgetApplication_HiltComponents_SingletonC {
 
     private Provider<BudgetRepositoryImpl> budgetRepositoryImplProvider;
 
-    private Provider<TransactionDao> provideTransactionDaoProvider;
-
-    private Provider<TransactionRepositoryImpl> transactionRepositoryImplProvider;
-
     private SingletonCImpl(ApplicationContextModule applicationContextModuleParam) {
       this.applicationContextModule = applicationContextModuleParam;
       initialize(applicationContextModuleParam);
 
     }
 
+    private Map<String, javax.inject.Provider<WorkerAssistedFactory<? extends ListenableWorker>>> mapOfStringAndProviderOfWorkerAssistedFactoryOf(
+        ) {
+      return Collections.<String, javax.inject.Provider<WorkerAssistedFactory<? extends ListenableWorker>>>singletonMap("com.buddga.worker.RecurringTransactionWorker", ((Provider) recurringTransactionWorker_AssistedFactoryProvider));
+    }
+
     private HiltWorkerFactory hiltWorkerFactory() {
-      return WorkerFactoryModule_ProvideFactoryFactory.provideFactory(Collections.<String, javax.inject.Provider<WorkerAssistedFactory<? extends ListenableWorker>>>emptyMap());
+      return WorkerFactoryModule_ProvideFactoryFactory.provideFactory(mapOfStringAndProviderOfWorkerAssistedFactoryOf());
     }
 
     @SuppressWarnings("unchecked")
     private void initialize(final ApplicationContextModule applicationContextModuleParam) {
-      this.provideBudgetDatabaseProvider = DoubleCheck.provider(new SwitchingProvider<BudgetDatabase>(singletonCImpl, 2));
-      this.provideAccountDaoProvider = DoubleCheck.provider(new SwitchingProvider<AccountDao>(singletonCImpl, 1));
-      this.accountRepositoryImplProvider = DoubleCheck.provider(new SwitchingProvider<AccountRepositoryImpl>(singletonCImpl, 0));
-      this.provideBillDaoProvider = DoubleCheck.provider(new SwitchingProvider<BillDao>(singletonCImpl, 4));
-      this.billRepositoryImplProvider = DoubleCheck.provider(new SwitchingProvider<BillRepositoryImpl>(singletonCImpl, 3));
-      this.provideCategoryDaoProvider = DoubleCheck.provider(new SwitchingProvider<CategoryDao>(singletonCImpl, 6));
-      this.categoryRepositoryImplProvider = DoubleCheck.provider(new SwitchingProvider<CategoryRepositoryImpl>(singletonCImpl, 5));
-      this.provideBudgetDaoProvider = DoubleCheck.provider(new SwitchingProvider<BudgetDao>(singletonCImpl, 8));
-      this.budgetRepositoryImplProvider = DoubleCheck.provider(new SwitchingProvider<BudgetRepositoryImpl>(singletonCImpl, 7));
-      this.provideTransactionDaoProvider = DoubleCheck.provider(new SwitchingProvider<TransactionDao>(singletonCImpl, 10));
-      this.transactionRepositoryImplProvider = DoubleCheck.provider(new SwitchingProvider<TransactionRepositoryImpl>(singletonCImpl, 9));
+      this.provideBudgetDatabaseProvider = DoubleCheck.provider(new SwitchingProvider<BudgetDatabase>(singletonCImpl, 3));
+      this.provideTransactionDaoProvider = DoubleCheck.provider(new SwitchingProvider<TransactionDao>(singletonCImpl, 2));
+      this.transactionRepositoryImplProvider = DoubleCheck.provider(new SwitchingProvider<TransactionRepositoryImpl>(singletonCImpl, 1));
+      this.recurringTransactionWorker_AssistedFactoryProvider = SingleCheck.provider(new SwitchingProvider<RecurringTransactionWorker_AssistedFactory>(singletonCImpl, 0));
+      this.provideAccountDaoProvider = DoubleCheck.provider(new SwitchingProvider<AccountDao>(singletonCImpl, 5));
+      this.accountRepositoryImplProvider = DoubleCheck.provider(new SwitchingProvider<AccountRepositoryImpl>(singletonCImpl, 4));
+      this.provideBillDaoProvider = DoubleCheck.provider(new SwitchingProvider<BillDao>(singletonCImpl, 7));
+      this.billRepositoryImplProvider = DoubleCheck.provider(new SwitchingProvider<BillRepositoryImpl>(singletonCImpl, 6));
+      this.provideCategoryDaoProvider = DoubleCheck.provider(new SwitchingProvider<CategoryDao>(singletonCImpl, 9));
+      this.categoryRepositoryImplProvider = DoubleCheck.provider(new SwitchingProvider<CategoryRepositoryImpl>(singletonCImpl, 8));
+      this.provideBudgetDaoProvider = DoubleCheck.provider(new SwitchingProvider<BudgetDao>(singletonCImpl, 11));
+      this.budgetRepositoryImplProvider = DoubleCheck.provider(new SwitchingProvider<BudgetRepositoryImpl>(singletonCImpl, 10));
     }
 
     @Override
@@ -718,38 +731,47 @@ public final class DaggerBudgetApplication_HiltComponents_SingletonC {
       @Override
       public T get() {
         switch (id) {
-          case 0: // com.buddga.data.repository.AccountRepositoryImpl 
-          return (T) new AccountRepositoryImpl(singletonCImpl.provideAccountDaoProvider.get());
+          case 0: // com.buddga.worker.RecurringTransactionWorker_AssistedFactory 
+          return (T) new RecurringTransactionWorker_AssistedFactory() {
+            @Override
+            public RecurringTransactionWorker create(Context appContext,
+                WorkerParameters workerParams) {
+              return new RecurringTransactionWorker(appContext, workerParams, singletonCImpl.transactionRepositoryImplProvider.get());
+            }
+          };
 
-          case 1: // com.buddga.data.local.database.dao.AccountDao 
-          return (T) DatabaseModule_ProvideAccountDaoFactory.provideAccountDao(singletonCImpl.provideBudgetDatabaseProvider.get());
-
-          case 2: // com.buddga.data.local.database.BudgetDatabase 
-          return (T) DatabaseModule_ProvideBudgetDatabaseFactory.provideBudgetDatabase(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
-
-          case 3: // com.buddga.data.repository.BillRepositoryImpl 
-          return (T) new BillRepositoryImpl(singletonCImpl.provideBillDaoProvider.get());
-
-          case 4: // com.buddga.data.local.database.dao.BillDao 
-          return (T) DatabaseModule_ProvideBillDaoFactory.provideBillDao(singletonCImpl.provideBudgetDatabaseProvider.get());
-
-          case 5: // com.buddga.data.repository.CategoryRepositoryImpl 
-          return (T) new CategoryRepositoryImpl(singletonCImpl.provideCategoryDaoProvider.get());
-
-          case 6: // com.buddga.data.local.database.dao.CategoryDao 
-          return (T) DatabaseModule_ProvideCategoryDaoFactory.provideCategoryDao(singletonCImpl.provideBudgetDatabaseProvider.get());
-
-          case 7: // com.buddga.data.repository.BudgetRepositoryImpl 
-          return (T) new BudgetRepositoryImpl(singletonCImpl.provideBudgetDaoProvider.get());
-
-          case 8: // com.buddga.data.local.database.dao.BudgetDao 
-          return (T) DatabaseModule_ProvideBudgetDaoFactory.provideBudgetDao(singletonCImpl.provideBudgetDatabaseProvider.get());
-
-          case 9: // com.buddga.data.repository.TransactionRepositoryImpl 
+          case 1: // com.buddga.data.repository.TransactionRepositoryImpl 
           return (T) new TransactionRepositoryImpl(singletonCImpl.provideTransactionDaoProvider.get());
 
-          case 10: // com.buddga.data.local.database.dao.TransactionDao 
+          case 2: // com.buddga.data.local.database.dao.TransactionDao 
           return (T) DatabaseModule_ProvideTransactionDaoFactory.provideTransactionDao(singletonCImpl.provideBudgetDatabaseProvider.get());
+
+          case 3: // com.buddga.data.local.database.BudgetDatabase 
+          return (T) DatabaseModule_ProvideBudgetDatabaseFactory.provideBudgetDatabase(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
+
+          case 4: // com.buddga.data.repository.AccountRepositoryImpl 
+          return (T) new AccountRepositoryImpl(singletonCImpl.provideAccountDaoProvider.get());
+
+          case 5: // com.buddga.data.local.database.dao.AccountDao 
+          return (T) DatabaseModule_ProvideAccountDaoFactory.provideAccountDao(singletonCImpl.provideBudgetDatabaseProvider.get());
+
+          case 6: // com.buddga.data.repository.BillRepositoryImpl 
+          return (T) new BillRepositoryImpl(singletonCImpl.provideBillDaoProvider.get());
+
+          case 7: // com.buddga.data.local.database.dao.BillDao 
+          return (T) DatabaseModule_ProvideBillDaoFactory.provideBillDao(singletonCImpl.provideBudgetDatabaseProvider.get());
+
+          case 8: // com.buddga.data.repository.CategoryRepositoryImpl 
+          return (T) new CategoryRepositoryImpl(singletonCImpl.provideCategoryDaoProvider.get());
+
+          case 9: // com.buddga.data.local.database.dao.CategoryDao 
+          return (T) DatabaseModule_ProvideCategoryDaoFactory.provideCategoryDao(singletonCImpl.provideBudgetDatabaseProvider.get());
+
+          case 10: // com.buddga.data.repository.BudgetRepositoryImpl 
+          return (T) new BudgetRepositoryImpl(singletonCImpl.provideBudgetDaoProvider.get());
+
+          case 11: // com.buddga.data.local.database.dao.BudgetDao 
+          return (T) DatabaseModule_ProvideBudgetDaoFactory.provideBudgetDao(singletonCImpl.provideBudgetDatabaseProvider.get());
 
           default: throw new AssertionError(id);
         }

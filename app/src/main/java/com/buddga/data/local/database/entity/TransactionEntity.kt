@@ -40,6 +40,11 @@ data class TransactionEntity(
     val date: Long, // Epoch day
     val isReconciled: Boolean = false,
     val isCleared: Boolean = false,
+    val isPending: Boolean = false,
+    val isRecurring: Boolean = false,
+    val recurrenceFrequency: String? = null, // WEEKLY, BIWEEKLY, MONTHLY, QUARTERLY, YEARLY
+    val nextOccurrenceDate: Long? = null, // Epoch day
+    val parentTransactionId: Long? = null,
     val createdAt: Long,
     val updatedAt: Long
 )
@@ -55,6 +60,11 @@ data class TransactionWithDetailsEntity(
     val date: Long,
     val isReconciled: Boolean,
     val isCleared: Boolean,
+    val isPending: Boolean,
+    val isRecurring: Boolean,
+    val recurrenceFrequency: String?,
+    val nextOccurrenceDate: Long?,
+    val parentTransactionId: Long?,
     val categoryName: String?,
     val categoryColor: Long?,
     val accountName: String

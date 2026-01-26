@@ -15,8 +15,9 @@ interface TransactionDao {
 
     @Query("""
         SELECT t.id, t.amount, t.type, t.categoryId, t.accountId, t.payee, t.memo,
-               t.date, t.isReconciled, t.isCleared, c.name as categoryName,
-               c.color as categoryColor, a.name as accountName
+               t.date, t.isReconciled, t.isCleared, t.isPending, t.isRecurring,
+               t.recurrenceFrequency, t.nextOccurrenceDate, t.parentTransactionId,
+               c.name as categoryName, c.color as categoryColor, a.name as accountName
         FROM transactions t
         LEFT JOIN categories c ON t.categoryId = c.id
         INNER JOIN accounts a ON t.accountId = a.id
@@ -26,8 +27,9 @@ interface TransactionDao {
 
     @Query("""
         SELECT t.id, t.amount, t.type, t.categoryId, t.accountId, t.payee, t.memo,
-               t.date, t.isReconciled, t.isCleared, c.name as categoryName,
-               c.color as categoryColor, a.name as accountName
+               t.date, t.isReconciled, t.isCleared, t.isPending, t.isRecurring,
+               t.recurrenceFrequency, t.nextOccurrenceDate, t.parentTransactionId,
+               c.name as categoryName, c.color as categoryColor, a.name as accountName
         FROM transactions t
         LEFT JOIN categories c ON t.categoryId = c.id
         INNER JOIN accounts a ON t.accountId = a.id
@@ -38,8 +40,9 @@ interface TransactionDao {
 
     @Query("""
         SELECT t.id, t.amount, t.type, t.categoryId, t.accountId, t.payee, t.memo,
-               t.date, t.isReconciled, t.isCleared, c.name as categoryName,
-               c.color as categoryColor, a.name as accountName
+               t.date, t.isReconciled, t.isCleared, t.isPending, t.isRecurring,
+               t.recurrenceFrequency, t.nextOccurrenceDate, t.parentTransactionId,
+               c.name as categoryName, c.color as categoryColor, a.name as accountName
         FROM transactions t
         LEFT JOIN categories c ON t.categoryId = c.id
         INNER JOIN accounts a ON t.accountId = a.id

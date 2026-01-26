@@ -64,7 +64,9 @@ fun AddCategoryScreen(
     var categoryName by remember { mutableStateOf("") }
     var selectedGroup by remember { mutableStateOf(newGroupName ?: "") }
     var selectedColor by remember { mutableStateOf(predefinedColors[0]) }
+    var selectedType by remember { mutableStateOf(com.buddga.domain.model.CategoryType.EXPENSE) }
     var groupExpanded by remember { mutableStateOf(false) }
+    var typeExpanded by remember { mutableStateOf(false) }
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -121,6 +123,45 @@ fun AddCategoryScreen(
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
+
+            // Category Type Selection
+            ExposedDropdownMenuBox(
+                expanded = typeExpanded,
+                onExpandedChange = { typeExpanded = !typeExpanded }
+            ) {
+                OutlinedTextField(
+                    value = if (selectedType == com.buddga.domain.model.CategoryType.INCOME) "Income" else "Expense",
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Category Type") },
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = typeExpanded)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor(),
+                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+                )
+                ExposedDropdownMenu(
+                    expanded = typeExpanded,
+                    onDismissRequest = { typeExpanded = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Income") },
+                        onClick = {
+                            selectedType = com.buddga.domain.model.CategoryType.INCOME
+                            typeExpanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Expense") },
+                        onClick = {
+                            selectedType = com.buddga.domain.model.CategoryType.EXPENSE
+                            typeExpanded = false
+                        }
+                    )
+                }
+            }
 
             // Group Selection
             ExposedDropdownMenuBox(
@@ -260,7 +301,8 @@ fun AddCategoryScreen(
                                 name = categoryName,
                                 color = selectedColor,
                                 icon = "category",
-                                groupName = selectedGroup
+                                groupName = selectedGroup,
+                                type = selectedType
                             )
                             onNavigateBack()
                         }

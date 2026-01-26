@@ -16,6 +16,7 @@ import com.buddga.domain.model.BillWithCategory
 import com.buddga.domain.model.Budget
 import com.buddga.domain.model.BudgetWithCategory
 import com.buddga.domain.model.Category
+import com.buddga.domain.model.CategoryType
 import com.buddga.domain.model.Transaction
 import com.buddga.domain.model.TransactionType
 import com.buddga.domain.model.TransactionWithDetails
@@ -58,6 +59,7 @@ fun CategoryEntity.toDomain(): Category = Category(
     color = color,
     icon = icon,
     groupName = groupName,
+    type = CategoryType.valueOf(type),
     sortOrder = sortOrder,
     isHidden = isHidden
 )
@@ -68,6 +70,7 @@ fun Category.toEntity(): CategoryEntity = CategoryEntity(
     color = color,
     icon = icon,
     groupName = groupName,
+    type = type.name,
     sortOrder = sortOrder,
     isHidden = isHidden
 )
@@ -85,6 +88,11 @@ fun TransactionEntity.toDomain(): Transaction = Transaction(
     date = LocalDate.ofEpochDay(date),
     isReconciled = isReconciled,
     isCleared = isCleared,
+    isPending = isPending,
+    isRecurring = isRecurring,
+    recurrenceFrequency = recurrenceFrequency?.let { com.buddga.domain.model.RecurrenceFrequency.valueOf(it) },
+    nextOccurrenceDate = nextOccurrenceDate?.let { LocalDate.ofEpochDay(it) },
+    parentTransactionId = parentTransactionId,
     createdAt = LocalDateTime.ofInstant(Instant.ofEpochMilli(createdAt), ZoneId.systemDefault()),
     updatedAt = LocalDateTime.ofInstant(Instant.ofEpochMilli(updatedAt), ZoneId.systemDefault())
 )
@@ -101,6 +109,11 @@ fun Transaction.toEntity(): TransactionEntity = TransactionEntity(
     date = date.toEpochDay(),
     isReconciled = isReconciled,
     isCleared = isCleared,
+    isPending = isPending,
+    isRecurring = isRecurring,
+    recurrenceFrequency = recurrenceFrequency?.name,
+    nextOccurrenceDate = nextOccurrenceDate?.toEpochDay(),
+    parentTransactionId = parentTransactionId,
     createdAt = createdAt.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(),
     updatedAt = updatedAt.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
 )
@@ -116,7 +129,12 @@ fun TransactionWithDetailsEntity.toDomain(): TransactionWithDetails = Transactio
         memo = memo,
         date = LocalDate.ofEpochDay(date),
         isReconciled = isReconciled,
-        isCleared = isCleared
+        isCleared = isCleared,
+        isPending = isPending,
+        isRecurring = isRecurring,
+        recurrenceFrequency = recurrenceFrequency?.let { com.buddga.domain.model.RecurrenceFrequency.valueOf(it) },
+        nextOccurrenceDate = nextOccurrenceDate?.let { LocalDate.ofEpochDay(it) },
+        parentTransactionId = parentTransactionId
     ),
     categoryName = categoryName ?: "Uncategorized",
     categoryColor = categoryColor ?: 0xFF607D8B,
@@ -153,7 +171,8 @@ fun BudgetWithCategoryEntity.toDomain(): BudgetWithCategory = BudgetWithCategory
         name = categoryName,
         color = categoryColor,
         icon = categoryIcon,
-        groupName = categoryGroupName
+        groupName = categoryGroupName,
+        type = CategoryType.EXPENSE // Default to expense for existing data
     )
 )
 

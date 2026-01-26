@@ -50,7 +50,7 @@ public final class CategoryDao_Impl implements CategoryDao {
       @Override
       @NonNull
       protected String createQuery() {
-        return "INSERT OR REPLACE INTO `categories` (`id`,`name`,`color`,`icon`,`groupName`,`sortOrder`,`isHidden`) VALUES (nullif(?, 0),?,?,?,?,?,?)";
+        return "INSERT OR REPLACE INTO `categories` (`id`,`name`,`color`,`icon`,`groupName`,`type`,`sortOrder`,`isHidden`) VALUES (nullif(?, 0),?,?,?,?,?,?,?)";
       }
 
       @Override
@@ -61,9 +61,10 @@ public final class CategoryDao_Impl implements CategoryDao {
         statement.bindLong(3, entity.getColor());
         statement.bindString(4, entity.getIcon());
         statement.bindString(5, entity.getGroupName());
-        statement.bindLong(6, entity.getSortOrder());
+        statement.bindString(6, entity.getType());
+        statement.bindLong(7, entity.getSortOrder());
         final int _tmp = entity.isHidden() ? 1 : 0;
-        statement.bindLong(7, _tmp);
+        statement.bindLong(8, _tmp);
       }
     };
     this.__deletionAdapterOfCategoryEntity = new EntityDeletionOrUpdateAdapter<CategoryEntity>(__db) {
@@ -83,7 +84,7 @@ public final class CategoryDao_Impl implements CategoryDao {
       @Override
       @NonNull
       protected String createQuery() {
-        return "UPDATE OR ABORT `categories` SET `id` = ?,`name` = ?,`color` = ?,`icon` = ?,`groupName` = ?,`sortOrder` = ?,`isHidden` = ? WHERE `id` = ?";
+        return "UPDATE OR ABORT `categories` SET `id` = ?,`name` = ?,`color` = ?,`icon` = ?,`groupName` = ?,`type` = ?,`sortOrder` = ?,`isHidden` = ? WHERE `id` = ?";
       }
 
       @Override
@@ -94,10 +95,11 @@ public final class CategoryDao_Impl implements CategoryDao {
         statement.bindLong(3, entity.getColor());
         statement.bindString(4, entity.getIcon());
         statement.bindString(5, entity.getGroupName());
-        statement.bindLong(6, entity.getSortOrder());
+        statement.bindString(6, entity.getType());
+        statement.bindLong(7, entity.getSortOrder());
         final int _tmp = entity.isHidden() ? 1 : 0;
-        statement.bindLong(7, _tmp);
-        statement.bindLong(8, entity.getId());
+        statement.bindLong(8, _tmp);
+        statement.bindLong(9, entity.getId());
       }
     };
     this.__preparedStmtOfSetHidden = new SharedSQLiteStatement(__db) {
@@ -230,6 +232,7 @@ public final class CategoryDao_Impl implements CategoryDao {
           final int _cursorIndexOfColor = CursorUtil.getColumnIndexOrThrow(_cursor, "color");
           final int _cursorIndexOfIcon = CursorUtil.getColumnIndexOrThrow(_cursor, "icon");
           final int _cursorIndexOfGroupName = CursorUtil.getColumnIndexOrThrow(_cursor, "groupName");
+          final int _cursorIndexOfType = CursorUtil.getColumnIndexOrThrow(_cursor, "type");
           final int _cursorIndexOfSortOrder = CursorUtil.getColumnIndexOrThrow(_cursor, "sortOrder");
           final int _cursorIndexOfIsHidden = CursorUtil.getColumnIndexOrThrow(_cursor, "isHidden");
           final List<CategoryEntity> _result = new ArrayList<CategoryEntity>(_cursor.getCount());
@@ -245,13 +248,15 @@ public final class CategoryDao_Impl implements CategoryDao {
             _tmpIcon = _cursor.getString(_cursorIndexOfIcon);
             final String _tmpGroupName;
             _tmpGroupName = _cursor.getString(_cursorIndexOfGroupName);
+            final String _tmpType;
+            _tmpType = _cursor.getString(_cursorIndexOfType);
             final int _tmpSortOrder;
             _tmpSortOrder = _cursor.getInt(_cursorIndexOfSortOrder);
             final boolean _tmpIsHidden;
             final int _tmp;
             _tmp = _cursor.getInt(_cursorIndexOfIsHidden);
             _tmpIsHidden = _tmp != 0;
-            _item = new CategoryEntity(_tmpId,_tmpName,_tmpColor,_tmpIcon,_tmpGroupName,_tmpSortOrder,_tmpIsHidden);
+            _item = new CategoryEntity(_tmpId,_tmpName,_tmpColor,_tmpIcon,_tmpGroupName,_tmpType,_tmpSortOrder,_tmpIsHidden);
             _result.add(_item);
           }
           return _result;
@@ -282,6 +287,7 @@ public final class CategoryDao_Impl implements CategoryDao {
           final int _cursorIndexOfColor = CursorUtil.getColumnIndexOrThrow(_cursor, "color");
           final int _cursorIndexOfIcon = CursorUtil.getColumnIndexOrThrow(_cursor, "icon");
           final int _cursorIndexOfGroupName = CursorUtil.getColumnIndexOrThrow(_cursor, "groupName");
+          final int _cursorIndexOfType = CursorUtil.getColumnIndexOrThrow(_cursor, "type");
           final int _cursorIndexOfSortOrder = CursorUtil.getColumnIndexOrThrow(_cursor, "sortOrder");
           final int _cursorIndexOfIsHidden = CursorUtil.getColumnIndexOrThrow(_cursor, "isHidden");
           final List<CategoryEntity> _result = new ArrayList<CategoryEntity>(_cursor.getCount());
@@ -297,13 +303,15 @@ public final class CategoryDao_Impl implements CategoryDao {
             _tmpIcon = _cursor.getString(_cursorIndexOfIcon);
             final String _tmpGroupName;
             _tmpGroupName = _cursor.getString(_cursorIndexOfGroupName);
+            final String _tmpType;
+            _tmpType = _cursor.getString(_cursorIndexOfType);
             final int _tmpSortOrder;
             _tmpSortOrder = _cursor.getInt(_cursorIndexOfSortOrder);
             final boolean _tmpIsHidden;
             final int _tmp;
             _tmp = _cursor.getInt(_cursorIndexOfIsHidden);
             _tmpIsHidden = _tmp != 0;
-            _item = new CategoryEntity(_tmpId,_tmpName,_tmpColor,_tmpIcon,_tmpGroupName,_tmpSortOrder,_tmpIsHidden);
+            _item = new CategoryEntity(_tmpId,_tmpName,_tmpColor,_tmpIcon,_tmpGroupName,_tmpType,_tmpSortOrder,_tmpIsHidden);
             _result.add(_item);
           }
           return _result;
@@ -336,6 +344,7 @@ public final class CategoryDao_Impl implements CategoryDao {
           final int _cursorIndexOfColor = CursorUtil.getColumnIndexOrThrow(_cursor, "color");
           final int _cursorIndexOfIcon = CursorUtil.getColumnIndexOrThrow(_cursor, "icon");
           final int _cursorIndexOfGroupName = CursorUtil.getColumnIndexOrThrow(_cursor, "groupName");
+          final int _cursorIndexOfType = CursorUtil.getColumnIndexOrThrow(_cursor, "type");
           final int _cursorIndexOfSortOrder = CursorUtil.getColumnIndexOrThrow(_cursor, "sortOrder");
           final int _cursorIndexOfIsHidden = CursorUtil.getColumnIndexOrThrow(_cursor, "isHidden");
           final List<CategoryEntity> _result = new ArrayList<CategoryEntity>(_cursor.getCount());
@@ -351,13 +360,15 @@ public final class CategoryDao_Impl implements CategoryDao {
             _tmpIcon = _cursor.getString(_cursorIndexOfIcon);
             final String _tmpGroupName;
             _tmpGroupName = _cursor.getString(_cursorIndexOfGroupName);
+            final String _tmpType;
+            _tmpType = _cursor.getString(_cursorIndexOfType);
             final int _tmpSortOrder;
             _tmpSortOrder = _cursor.getInt(_cursorIndexOfSortOrder);
             final boolean _tmpIsHidden;
             final int _tmp;
             _tmp = _cursor.getInt(_cursorIndexOfIsHidden);
             _tmpIsHidden = _tmp != 0;
-            _item = new CategoryEntity(_tmpId,_tmpName,_tmpColor,_tmpIcon,_tmpGroupName,_tmpSortOrder,_tmpIsHidden);
+            _item = new CategoryEntity(_tmpId,_tmpName,_tmpColor,_tmpIcon,_tmpGroupName,_tmpType,_tmpSortOrder,_tmpIsHidden);
             _result.add(_item);
           }
           return _result;
@@ -421,6 +432,7 @@ public final class CategoryDao_Impl implements CategoryDao {
           final int _cursorIndexOfColor = CursorUtil.getColumnIndexOrThrow(_cursor, "color");
           final int _cursorIndexOfIcon = CursorUtil.getColumnIndexOrThrow(_cursor, "icon");
           final int _cursorIndexOfGroupName = CursorUtil.getColumnIndexOrThrow(_cursor, "groupName");
+          final int _cursorIndexOfType = CursorUtil.getColumnIndexOrThrow(_cursor, "type");
           final int _cursorIndexOfSortOrder = CursorUtil.getColumnIndexOrThrow(_cursor, "sortOrder");
           final int _cursorIndexOfIsHidden = CursorUtil.getColumnIndexOrThrow(_cursor, "isHidden");
           final CategoryEntity _result;
@@ -435,13 +447,15 @@ public final class CategoryDao_Impl implements CategoryDao {
             _tmpIcon = _cursor.getString(_cursorIndexOfIcon);
             final String _tmpGroupName;
             _tmpGroupName = _cursor.getString(_cursorIndexOfGroupName);
+            final String _tmpType;
+            _tmpType = _cursor.getString(_cursorIndexOfType);
             final int _tmpSortOrder;
             _tmpSortOrder = _cursor.getInt(_cursorIndexOfSortOrder);
             final boolean _tmpIsHidden;
             final int _tmp;
             _tmp = _cursor.getInt(_cursorIndexOfIsHidden);
             _tmpIsHidden = _tmp != 0;
-            _result = new CategoryEntity(_tmpId,_tmpName,_tmpColor,_tmpIcon,_tmpGroupName,_tmpSortOrder,_tmpIsHidden);
+            _result = new CategoryEntity(_tmpId,_tmpName,_tmpColor,_tmpIcon,_tmpGroupName,_tmpType,_tmpSortOrder,_tmpIsHidden);
           } else {
             _result = null;
           }
@@ -471,6 +485,7 @@ public final class CategoryDao_Impl implements CategoryDao {
           final int _cursorIndexOfColor = CursorUtil.getColumnIndexOrThrow(_cursor, "color");
           final int _cursorIndexOfIcon = CursorUtil.getColumnIndexOrThrow(_cursor, "icon");
           final int _cursorIndexOfGroupName = CursorUtil.getColumnIndexOrThrow(_cursor, "groupName");
+          final int _cursorIndexOfType = CursorUtil.getColumnIndexOrThrow(_cursor, "type");
           final int _cursorIndexOfSortOrder = CursorUtil.getColumnIndexOrThrow(_cursor, "sortOrder");
           final int _cursorIndexOfIsHidden = CursorUtil.getColumnIndexOrThrow(_cursor, "isHidden");
           final CategoryEntity _result;
@@ -485,13 +500,15 @@ public final class CategoryDao_Impl implements CategoryDao {
             _tmpIcon = _cursor.getString(_cursorIndexOfIcon);
             final String _tmpGroupName;
             _tmpGroupName = _cursor.getString(_cursorIndexOfGroupName);
+            final String _tmpType;
+            _tmpType = _cursor.getString(_cursorIndexOfType);
             final int _tmpSortOrder;
             _tmpSortOrder = _cursor.getInt(_cursorIndexOfSortOrder);
             final boolean _tmpIsHidden;
             final int _tmp;
             _tmp = _cursor.getInt(_cursorIndexOfIsHidden);
             _tmpIsHidden = _tmp != 0;
-            _result = new CategoryEntity(_tmpId,_tmpName,_tmpColor,_tmpIcon,_tmpGroupName,_tmpSortOrder,_tmpIsHidden);
+            _result = new CategoryEntity(_tmpId,_tmpName,_tmpColor,_tmpIcon,_tmpGroupName,_tmpType,_tmpSortOrder,_tmpIsHidden);
           } else {
             _result = null;
           }
@@ -527,6 +544,7 @@ public final class CategoryDao_Impl implements CategoryDao {
           final int _cursorIndexOfColor = CursorUtil.getColumnIndexOrThrow(_cursor, "color");
           final int _cursorIndexOfIcon = CursorUtil.getColumnIndexOrThrow(_cursor, "icon");
           final int _cursorIndexOfGroupName = CursorUtil.getColumnIndexOrThrow(_cursor, "groupName");
+          final int _cursorIndexOfType = CursorUtil.getColumnIndexOrThrow(_cursor, "type");
           final int _cursorIndexOfSortOrder = CursorUtil.getColumnIndexOrThrow(_cursor, "sortOrder");
           final int _cursorIndexOfIsHidden = CursorUtil.getColumnIndexOrThrow(_cursor, "isHidden");
           final CategoryEntity _result;
@@ -541,13 +559,15 @@ public final class CategoryDao_Impl implements CategoryDao {
             _tmpIcon = _cursor.getString(_cursorIndexOfIcon);
             final String _tmpGroupName;
             _tmpGroupName = _cursor.getString(_cursorIndexOfGroupName);
+            final String _tmpType;
+            _tmpType = _cursor.getString(_cursorIndexOfType);
             final int _tmpSortOrder;
             _tmpSortOrder = _cursor.getInt(_cursorIndexOfSortOrder);
             final boolean _tmpIsHidden;
             final int _tmp;
             _tmp = _cursor.getInt(_cursorIndexOfIsHidden);
             _tmpIsHidden = _tmp != 0;
-            _result = new CategoryEntity(_tmpId,_tmpName,_tmpColor,_tmpIcon,_tmpGroupName,_tmpSortOrder,_tmpIsHidden);
+            _result = new CategoryEntity(_tmpId,_tmpName,_tmpColor,_tmpIcon,_tmpGroupName,_tmpType,_tmpSortOrder,_tmpIsHidden);
           } else {
             _result = null;
           }

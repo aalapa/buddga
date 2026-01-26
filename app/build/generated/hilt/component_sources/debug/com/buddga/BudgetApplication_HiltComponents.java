@@ -16,6 +16,7 @@ import com.buddga.ui.screens.transactions.AddTransactionViewModel_HiltModules;
 import com.buddga.ui.screens.transactions.TransactionsViewModel_HiltModules;
 import com.buddga.ui.screens.warning.CashFlowWarningViewModel_HiltModules;
 import com.buddga.ui.screens.weekly.WeeklyCashFlowViewModel_HiltModules;
+import com.buddga.worker.RecurringTransactionWorker_HiltModule;
 import dagger.Binds;
 import dagger.Component;
 import dagger.Module;
@@ -147,6 +148,7 @@ public final class BudgetApplication_HiltComponents {
           DatabaseModule.class,
           HiltWrapper_FragmentGetContextFix_FragmentGetContextFixModule.class,
           HiltWrapper_WorkerFactoryModule.class,
+          RecurringTransactionWorker_HiltModule.class,
           RepositoryModule.class
       }
   )

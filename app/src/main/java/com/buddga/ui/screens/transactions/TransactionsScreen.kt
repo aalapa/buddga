@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.buddga.ui.components.PendingTransactionItem
 import com.buddga.ui.components.TransactionDateHeader
 import com.buddga.ui.components.TransactionItem
 import com.buddga.ui.components.TransactionSummaryCard
@@ -52,9 +53,19 @@ fun TransactionsScreen(
     val currencyFormat = remember { NumberFormat.getCurrencyInstance(Locale.US) }
     val dateFormatter = remember { DateTimeFormatter.ofPattern("EEEE, MMM d") }
 
-    // Group transactions by date
-    val groupedTransactions = remember(uiState.transactions) {
-        uiState.transactions.groupBy { it.transaction.date }
+    // Separate pending and regular transactions
+    val pendingTransactions = remember(uiState.transactions) {
+        uiState.transactions.filter { it.transaction.isPending }
+            .sortedBy { it.transaction.date }
+    }
+    
+    val regularTransactions = remember(uiState.transactions) {
+        uiState.transactions.filter { !it.transaction.isPending }
+    }
+    
+    // Group regular transactions by date
+    val groupedTransactions = remember(regularTransactions) {
+        regularTransactions.groupBy { it.transaction.date }
             .toSortedMap(compareByDescending { it })
     }
 
@@ -121,32 +132,45 @@ fun TransactionsScreen(
                 )
             }
 
-            // Add Transaction Card
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                ) {
-                    Column(
+            // Pending Transactions Section
+            if (pendingTransactions.isNotEmpty()) {
+                item {
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp)
+                            .padding(top = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Add Transaction",
+                            text = "Pending Transactions",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Tap the + button to add a new transaction",
+                            text = "${pendingTransactions.size} pending",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
+                }
+                
+                items(pendingTransactions) { transaction ->
+                    PendingTransactionItem(
+                        transaction = transaction,
+                        onApprove = {
+                            viewModel.approvePendingTransaction(transaction.transaction.id)
+                        },
+                        onEdit = {
+                            // TODO: Navigate to edit transaction screen
+                        },
+                        onSkip = {
+                            viewModel.skipPendingTransaction(transaction.transaction.id)
+                        },
+                        onDelete = {
+                            viewModel.deletePendingTransaction(transaction.transaction.id)
+                        }
+                    )
                 }
             }
 
@@ -165,7 +189,7 @@ fun TransactionsScreen(
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
-                        text = "${uiState.transactions.size} transactions",
+                        text = "${regularTransactions.size} transactions",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

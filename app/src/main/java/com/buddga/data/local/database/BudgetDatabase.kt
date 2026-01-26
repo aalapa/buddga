@@ -21,7 +21,7 @@ import com.buddga.data.local.database.entity.TransactionEntity
         BudgetEntity::class,
         BillEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = true
 )
 abstract class BudgetDatabase : RoomDatabase() {

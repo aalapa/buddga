@@ -47,6 +47,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -64,6 +65,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.buddga.domain.model.Account
 import com.buddga.domain.model.Category
+import com.buddga.domain.model.CategoryType
+import com.buddga.domain.model.RecurrenceFrequency
 import com.buddga.domain.model.TransactionType
 import com.buddga.ui.theme.ExpenseRed
 import com.buddga.ui.theme.IncomeGreen
@@ -93,10 +96,27 @@ fun AddTransactionScreen(
     var showDatePicker by remember { mutableStateOf(false) }
     var categoryExpanded by remember { mutableStateOf(false) }
     var accountExpanded by remember { mutableStateOf(false) }
+    var isRecurring by remember { mutableStateOf(false) }
+    var selectedFrequency by remember { mutableStateOf<RecurrenceFrequency?>(null) }
+    var frequencyExpanded by remember { mutableStateOf(false) }
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val dateFormatter = remember { DateTimeFormatter.ofPattern("MMM dd, yyyy") }
+    
+    // Filter categories based on transaction type
+    val filteredCategories = remember(uiState.categories, selectedType) {
+        when (selectedType) {
+            TransactionType.INCOME -> uiState.categories.filter { it.type == CategoryType.INCOME }
+            TransactionType.EXPENSE -> uiState.categories.filter { it.type == CategoryType.EXPENSE }
+            TransactionType.TRANSFER -> emptyList() // Transfers don't need categories
+        }
+    }
+    
+    // Reset category when type changes
+    LaunchedEffect(selectedType) {
+        selectedCategory = null
+    }
 
     Scaffold(
         topBar = {
@@ -226,7 +246,7 @@ fun AddTransactionScreen(
                     expanded = categoryExpanded,
                     onDismissRequest = { categoryExpanded = false }
                 ) {
-                    uiState.categories.forEach { category ->
+                    filteredCategories.forEach { category ->
                         DropdownMenuItem(
                             text = {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -308,6 +328,76 @@ fun AddTransactionScreen(
                 maxLines = 3
             )
 
+            // Recurring Transaction Toggle
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                )
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { isRecurring = !isRecurring }
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = "Recurring Transaction",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Text(
+                            text = if (isRecurring) "This transaction will repeat" else "One-time transaction",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    androidx.compose.material3.Switch(
+                        checked = isRecurring,
+                        onCheckedChange = { isRecurring = it }
+                    )
+                }
+            }
+
+            // Frequency Dropdown (shown only when recurring is enabled)
+            if (isRecurring) {
+                ExposedDropdownMenuBox(
+                    expanded = frequencyExpanded,
+                    onExpandedChange = { frequencyExpanded = it }
+                ) {
+                    OutlinedTextField(
+                        value = selectedFrequency?.name?.lowercase()?.replace('_', ' ')?.replaceFirstChar { it.uppercase() } ?: "",
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Frequency") },
+                        placeholder = { Text("Select frequency") },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = frequencyExpanded) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = frequencyExpanded,
+                        onDismissRequest = { frequencyExpanded = false }
+                    ) {
+                        RecurrenceFrequency.values().forEach { frequency ->
+                            DropdownMenuItem(
+                                text = { 
+                                    Text(frequency.name.lowercase().replace('_', ' ').replaceFirstChar { it.uppercase() }) 
+                                },
+                                onClick = {
+                                    selectedFrequency = frequency
+                                    frequencyExpanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+
             Spacer(modifier = Modifier.height(8.dp))
 
             // Save Button
@@ -334,6 +424,11 @@ fun AddTransactionScreen(
                                 snackbarHostState.showSnackbar("Please select an account")
                             }
                         }
+                        isRecurring && selectedFrequency == null -> {
+                            scope.launch {
+                                snackbarHostState.showSnackbar("Please select a frequency for recurring transaction")
+                            }
+                        }
                         else -> {
                             viewModel.addTransaction(
                                 amount = amount.toBigDecimal(),
@@ -342,7 +437,9 @@ fun AddTransactionScreen(
                                 accountId = selectedAccount!!.id,
                                 payee = payee.trim(),
                                 memo = memo.trim(),
-                                date = selectedDate
+                                date = selectedDate,
+                                isRecurring = isRecurring,
+                                recurrenceFrequency = selectedFrequency
                             )
                             onNavigateBack()
                         }

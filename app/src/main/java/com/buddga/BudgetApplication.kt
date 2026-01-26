@@ -6,7 +6,13 @@ import android.app.NotificationManager
 import android.content.Context
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import com.buddga.worker.RecurringTransactionWorker
 import dagger.hilt.android.HiltAndroidApp
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltAndroidApp
@@ -18,6 +24,24 @@ class BudgetApplication : Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
         createNotificationChannels()
+        scheduleRecurringTransactionWorker()
+    }
+    
+    private fun scheduleRecurringTransactionWorker() {
+        val constraints = Constraints.Builder()
+            .build()
+            
+        val recurringTransactionWork = PeriodicWorkRequestBuilder<RecurringTransactionWorker>(
+            1, TimeUnit.DAYS // Run once per day
+        )
+            .setConstraints(constraints)
+            .build()
+            
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "recurring_transaction_check",
+            ExistingPeriodicWorkPolicy.KEEP,
+            recurringTransactionWork
+        )
     }
 
     override val workManagerConfiguration: Configuration
