@@ -3,10 +3,12 @@ package com.buddga.ui.navigation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.Analytics
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.PieChart
 import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material.icons.outlined.AccountBalance
 import androidx.compose.material.icons.outlined.Analytics
+import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.PieChart
 import androidx.compose.material.icons.outlined.Receipt
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -43,6 +45,13 @@ sealed class Screen(
         title = "Cash Flow",
         selectedIcon = Icons.Filled.Analytics,
         unselectedIcon = Icons.Outlined.Analytics
+    )
+
+    data object Reports : Screen(
+        route = "reports",
+        title = "Reports",
+        selectedIcon = Icons.Filled.BarChart,
+        unselectedIcon = Icons.Outlined.BarChart
     )
 
     // Sub-screens (not in bottom nav)
@@ -110,6 +119,6 @@ sealed class Screen(
     )
 
     companion object {
-        val bottomNavItems = listOf(Accounts, Budgeting, Transactions, CashFlow)
+        val bottomNavItems = listOf(Accounts, Budgeting, Transactions, CashFlow, Reports)
     }
 }

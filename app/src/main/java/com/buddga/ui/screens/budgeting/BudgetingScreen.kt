@@ -3,8 +3,6 @@ package com.buddga.ui.screens.budgeting
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,11 +22,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -39,12 +34,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.buddga.ui.components.BudgetCategoryItem
-import com.buddga.ui.components.CategorySpendingLegendItem
-import com.buddga.ui.components.SpendingPieChart
 import com.buddga.ui.components.ToBeBudgetedCard
 import java.time.format.DateTimeFormatter
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BudgetingScreen(
     onNavigateToAddBudget: () -> Unit,
@@ -113,58 +106,6 @@ fun BudgetingScreen(
                 ToBeBudgetedCard(amount = uiState.toBeBudgeted)
             }
 
-            // Pie Chart with Legend
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                    ) {
-                        Text(
-                            text = "Category Spending",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold
-                        )
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            SpendingPieChart(
-                                categorySpending = uiState.categorySpending,
-                                totalSpent = uiState.totalSpent,
-                                modifier = Modifier.size(160.dp)
-                            )
-
-                            // Legend
-                            FlowRow(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .padding(start = 16.dp),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                                verticalArrangement = Arrangement.spacedBy(4.dp)
-                            ) {
-                                uiState.categorySpending.take(6).forEach { spending ->
-                                    CategorySpendingLegendItem(
-                                        name = spending.category.name,
-                                        color = Color(spending.category.color)
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
             // Budget Category List Header
             item {
                 Text(
@@ -223,24 +164,13 @@ fun BudgetingScreen(
                 }
             }
 
-            // Action Buttons
+            // Action Button
             item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                Button(
+                    onClick = onNavigateToAddBudget,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    OutlinedButton(
-                        onClick = onNavigateToAddCategory,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text("Create Category")
-                    }
-                    Button(
-                        onClick = onNavigateToAddBudget,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text("Add Budget")
-                    }
+                    Text("Add Budget")
                 }
             }
 

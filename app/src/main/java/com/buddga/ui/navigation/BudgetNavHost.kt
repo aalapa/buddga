@@ -28,6 +28,7 @@ import com.buddga.ui.screens.budgeting.BudgetingScreen
 import com.buddga.ui.screens.cashflow.CashFlowScreen
 import com.buddga.ui.screens.categories.AddCategoryScreen
 import com.buddga.ui.screens.forecast.CashFlowForecastScreen
+import com.buddga.ui.screens.reports.ReportsScreen
 import com.buddga.ui.screens.transactions.AddTransactionScreen
 import com.buddga.ui.screens.transactions.TransactionsScreen
 import com.buddga.ui.screens.warning.CashFlowWarningScreen
@@ -127,6 +128,10 @@ fun BudgetNavHost() {
                 )
             }
 
+            composable(Screen.Reports.route) {
+                ReportsScreen()
+            }
+
             // Sub-screens
             composable(Screen.CashFlowForecast.route) {
                 CashFlowForecastScreen(
@@ -168,7 +173,10 @@ fun BudgetNavHost() {
 
             composable(Screen.AddBudget.route) {
                 AddBudgetScreen(
-                    onNavigateBack = { navController.popBackStack() }
+                    onNavigateBack = { navController.popBackStack() },
+                    onNavigateToAddCategory = {
+                        navController.navigate(Screen.AddCategory.route)
+                    }
                 )
             }
 
