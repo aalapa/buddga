@@ -117,9 +117,10 @@ fun ToBeBudgetedCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "To Be Budgeted",
+                text = if (isPositive) "To Be Budgeted" else "Over Budgeted",
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.SemiBold,
+                color = if (isPositive) MaterialTheme.colorScheme.onSurface else ExpenseRed
             )
             Text(
                 text = currencyFormat.format(amount),

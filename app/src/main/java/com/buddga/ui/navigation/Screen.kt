@@ -118,6 +118,13 @@ sealed class Screen(
         unselectedIcon = Icons.Outlined.PieChart
     )
 
+    data object AddCategoryGroup : Screen(
+        route = "categories/group/add",
+        title = "Create Category Group",
+        selectedIcon = Icons.Filled.PieChart,
+        unselectedIcon = Icons.Outlined.PieChart
+    )
+
     companion object {
         val bottomNavItems = listOf(Accounts, Budgeting, Transactions, CashFlow, Reports)
     }

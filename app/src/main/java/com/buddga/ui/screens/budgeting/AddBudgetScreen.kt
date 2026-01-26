@@ -41,10 +41,12 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -68,12 +70,17 @@ fun AddBudgetScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     var selectedMonth by remember { mutableStateOf(YearMonth.now()) }
-    var selectedCategory by remember { mutableStateOf<Category?>(null) }
-    var allocatedAmount by remember { mutableStateOf("") }
+    // Map to store budget amounts for each category (using mutableStateMapOf for Compose reactivity)
+    val budgetAmounts = remember { mutableStateMapOf<Long, String>() }
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val monthFormatter = remember { DateTimeFormatter.ofPattern("MMMM yyyy") }
+    
+    // Calculate total budgeted amount (recalculates when budgetAmounts changes)
+    val totalBudgeted = budgetAmounts.values
+        .mapNotNull { it.toBigDecimalOrNull() }
+        .fold(java.math.BigDecimal.ZERO) { acc, amount -> acc + amount }
 
     Scaffold(
         topBar = {
@@ -143,25 +150,35 @@ fun AddBudgetScreen(
                 }
             }
 
-            // Budget Amount
-            OutlinedTextField(
-                value = allocatedAmount,
-                onValueChange = { newValue ->
-                    if (newValue.isEmpty() || newValue.matches(Regex("^\\d*\\.?\\d{0,2}$"))) {
-                        allocatedAmount = newValue
-                    }
-                },
-                label = { Text("Budget Amount") },
-                placeholder = { Text("0.00") },
-                prefix = { Text("$") },
+            // Total Budgeted Display
+            Card(
                 modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                singleLine = true
-            )
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                )
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    Text(
+                        text = "Total Budgeted",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                    Text(
+                        text = "$${String.format("%.2f", totalBudgeted)}",
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
+            }
 
             // Category Selection
             Text(
-                text = "Select Category",
+                text = "Enter Budget for Categories",
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold
             )
@@ -184,10 +201,16 @@ fun AddBudgetScreen(
                     }
 
                     items(categories) { category ->
-                        CategorySelectionItem(
+                        CategoryBudgetItem(
                             category = category,
-                            isSelected = selectedCategory?.id == category.id,
-                            onClick = { selectedCategory = category }
+                            budgetAmount = budgetAmounts[category.id] ?: "",
+                            onAmountChange = { newAmount ->
+                                if (newAmount.isEmpty()) {
+                                    budgetAmounts.remove(category.id)
+                                } else if (newAmount.matches(Regex("^\\d*\\.?\\d{0,2}$"))) {
+                                    budgetAmounts[category.id] = newAmount
+                                }
+                            }
                         )
                     }
                 }
@@ -204,25 +227,23 @@ fun AddBudgetScreen(
             // Save Button
             Button(
                 onClick = {
-                    when {
-                        selectedCategory == null -> {
-                            scope.launch {
-                                snackbarHostState.showSnackbar("Please select a category")
-                            }
+                    val budgetsToSave = budgetAmounts.mapNotNull { (categoryId, amount) ->
+                        amount.toBigDecimalOrNull()?.let { categoryId to it }
+                    }
+                    
+                    if (budgetsToSave.isEmpty()) {
+                        scope.launch {
+                            snackbarHostState.showSnackbar("Please enter at least one budget amount")
                         }
-                        allocatedAmount.isBlank() || allocatedAmount.toBigDecimalOrNull() == null -> {
-                            scope.launch {
-                                snackbarHostState.showSnackbar("Please enter a valid amount")
-                            }
-                        }
-                        else -> {
+                    } else {
+                        budgetsToSave.forEach { (categoryId, amount) ->
                             viewModel.addBudget(
-                                categoryId = selectedCategory!!.id,
+                                categoryId = categoryId,
                                 month = selectedMonth,
-                                allocated = allocatedAmount.toBigDecimal()
+                                allocated = amount
                             )
-                            onNavigateBack()
                         }
+                        onNavigateBack()
                     }
                 },
                 modifier = Modifier
@@ -230,7 +251,7 @@ fun AddBudgetScreen(
                     .height(56.dp)
             ) {
                 Text(
-                    text = "Save Budget",
+                    text = "Save All Budgets",
                     style = MaterialTheme.typography.titleMedium
                 )
             }
@@ -239,61 +260,59 @@ fun AddBudgetScreen(
 }
 
 @Composable
-private fun CategorySelectionItem(
+private fun CategoryBudgetItem(
     category: Category,
-    isSelected: Boolean,
-    onClick: () -> Unit
+    budgetAmount: String,
+    onAmountChange: (String) -> Unit
 ) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
+        modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = if (isSelected)
-                MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
-            else MaterialTheme.colorScheme.surface
+            containerColor = MaterialTheme.colorScheme.surface
         ),
-        border = if (isSelected)
-            androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
-        else null
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(36.dp)
                     .clip(CircleShape)
                     .background(Color(category.color).copy(alpha = 0.2f)),
                 contentAlignment = Alignment.Center
             ) {
                 Box(
                     modifier = Modifier
-                        .size(16.dp)
+                        .size(14.dp)
                         .clip(CircleShape)
                         .background(Color(category.color))
                 )
             }
 
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(12.dp))
 
             Text(
                 text = category.name,
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+                style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.weight(1f)
             )
 
-            if (isSelected) {
-                Icon(
-                    imageVector = Icons.Default.Check,
-                    contentDescription = "Selected",
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
+            Spacer(modifier = Modifier.width(8.dp))
+
+            OutlinedTextField(
+                value = budgetAmount,
+                onValueChange = onAmountChange,
+                modifier = Modifier.width(120.dp),
+                placeholder = { Text("0.00", style = MaterialTheme.typography.bodySmall) },
+                prefix = { Text("$", style = MaterialTheme.typography.bodySmall) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                singleLine = true,
+                textStyle = MaterialTheme.typography.bodyMedium
+            )
         }
     }
 }

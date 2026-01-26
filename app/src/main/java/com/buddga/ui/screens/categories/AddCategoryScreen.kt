@@ -57,17 +57,25 @@ import kotlinx.coroutines.launch
 @Composable
 fun AddCategoryScreen(
     onNavigateBack: () -> Unit,
+    onNavigateToCreateGroup: () -> Unit,
+    newGroupName: String? = null,
     viewModel: AddCategoryViewModel = hiltViewModel()
 ) {
     var categoryName by remember { mutableStateOf("") }
-    var selectedGroup by remember { mutableStateOf("") }
+    var selectedGroup by remember { mutableStateOf(newGroupName ?: "") }
     var selectedColor by remember { mutableStateOf(predefinedColors[0]) }
     var groupExpanded by remember { mutableStateOf(false) }
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    val categoryGroups = listOf("Income", "Essentials", "Lifestyle", "Bills", "Goals", "Other")
+    val categoryGroups = remember { mutableListOf("Income", "Essentials", "Lifestyle", "Bills", "Goals", "Other") }
+    
+    // Add new group if provided
+    if (newGroupName != null && !categoryGroups.contains(newGroupName)) {
+        categoryGroups.add(newGroupName)
+        selectedGroup = newGroupName
+    }
 
     Scaffold(
         topBar = {
@@ -146,6 +154,14 @@ fun AddCategoryScreen(
                         )
                     }
                 }
+            }
+            
+            // Create New Group Button
+            androidx.compose.material3.TextButton(
+                onClick = onNavigateToCreateGroup,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("+ Create New Group")
             }
 
             // Color Selection

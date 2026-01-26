@@ -12,6 +12,9 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -26,6 +29,7 @@ import com.buddga.ui.screens.bills.UpcomingBillsScreen
 import com.buddga.ui.screens.budgeting.AddBudgetScreen
 import com.buddga.ui.screens.budgeting.BudgetingScreen
 import com.buddga.ui.screens.cashflow.CashFlowScreen
+import com.buddga.ui.screens.categories.AddCategoryGroupScreen
 import com.buddga.ui.screens.categories.AddCategoryScreen
 import com.buddga.ui.screens.forecast.CashFlowForecastScreen
 import com.buddga.ui.screens.reports.ReportsScreen
@@ -39,6 +43,9 @@ fun BudgetNavHost() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
+    
+    // Track new group name from AddCategoryGroup screen
+    var newGroupName by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<String?>(null) }
 
     // Determine if we should show the bottom bar
     val showBottomBar = Screen.bottomNavItems.any { screen ->
@@ -188,7 +195,22 @@ fun BudgetNavHost() {
 
             composable(Screen.AddCategory.route) {
                 AddCategoryScreen(
-                    onNavigateBack = { navController.popBackStack() }
+                    onNavigateBack = { navController.popBackStack() },
+                    onNavigateToCreateGroup = {
+                        navController.navigate(Screen.AddCategoryGroup.route)
+                    },
+                    newGroupName = newGroupName
+                )
+            }
+
+            composable(Screen.AddCategoryGroup.route) {
+                AddCategoryGroupScreen(
+                    onNavigateBack = { groupName ->
+                        if (groupName != null) {
+                            newGroupName = groupName
+                        }
+                        navController.popBackStack()
+                    }
                 )
             }
         }
