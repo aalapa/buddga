@@ -97,6 +97,15 @@ sealed class Screen(
         unselectedIcon = Icons.Outlined.AccountBalance
     )
 
+    data object AccountDetail : Screen(
+        route = "accounts/{accountId}",
+        title = "Account",
+        selectedIcon = Icons.Filled.AccountBalance,
+        unselectedIcon = Icons.Outlined.AccountBalance
+    ) {
+        fun createRoute(accountId: Long) = "accounts/$accountId"
+    }
+
     data object AddBudget : Screen(
         route = "budgeting/add",
         title = "Add Budget",
@@ -125,7 +134,14 @@ sealed class Screen(
         unselectedIcon = Icons.Outlined.PieChart
     )
 
+    data object Settings : Screen(
+        route = "settings",
+        title = "Settings",
+        selectedIcon = Icons.Filled.BarChart,
+        unselectedIcon = Icons.Outlined.BarChart
+    )
+
     companion object {
-        val bottomNavItems = listOf(Accounts, Budgeting, Transactions, CashFlow, Reports)
+        val bottomNavItems = listOf(Budgeting, Accounts, Transactions, CashFlow, Reports)
     }
 }

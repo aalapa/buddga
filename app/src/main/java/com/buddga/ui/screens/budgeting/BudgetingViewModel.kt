@@ -9,15 +9,16 @@ import com.buddga.domain.repository.BudgetRepository
 import com.buddga.domain.repository.CategoryRepository
 import com.buddga.domain.repository.TransactionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
-import java.time.LocalDate
 import java.time.YearMonth
 import javax.inject.Inject
 
@@ -32,6 +33,7 @@ data class BudgetingUiState(
     val error: String? = null
 )
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class BudgetingViewModel @Inject constructor(
     private val budgetRepository: BudgetRepository,
@@ -43,41 +45,39 @@ class BudgetingViewModel @Inject constructor(
     private val _currentMonth = MutableStateFlow(YearMonth.now())
     val currentMonth: StateFlow<YearMonth> = _currentMonth.asStateFlow()
 
-    private val _isLoading = MutableStateFlow(true)
-
-    val uiState: StateFlow<BudgetingUiState> = combine(
-        _currentMonth,
-        budgetRepository.getBudgetsForMonth(_currentMonth.value),
-        accountRepository.getTotalOnBudgetBalance(),
-        budgetRepository.getTotalBudgetedForMonth(_currentMonth.value)
-    ) { month, budgets, totalBalance, totalBudgeted ->
-
+    val uiState: StateFlow<BudgetingUiState> = _currentMonth.flatMapLatest { month ->
         val startOfMonth = month.atDay(1)
         val endOfMonth = month.atEndOfMonth()
 
-        // Calculate spending per category
-        val categorySpending = budgets.map { budgetWithCategory ->
-            val spent = BigDecimal.ZERO // Will be calculated from transactions
-            CategorySpending(
-                category = budgetWithCategory.category,
-                spent = spent,
-                budgeted = budgetWithCategory.budget.allocated,
-                available = budgetWithCategory.budget.allocated - spent
+        combine(
+            budgetRepository.getBudgetsForMonth(month),
+            accountRepository.getTotalOnBudgetBalance(),
+            budgetRepository.getTotalBudgetedForMonth(month),
+            transactionRepository.getTotalExpenses(startOfMonth, endOfMonth)
+        ) { budgets, totalBalance, totalBudgeted, monthExpenses ->
+
+            val categorySpending = budgets.map { budgetWithCategory ->
+                CategorySpending(
+                    category = budgetWithCategory.category,
+                    spent = budgetWithCategory.budget.spent,
+                    budgeted = budgetWithCategory.budget.allocated,
+                    available = budgetWithCategory.budget.allocated + budgetWithCategory.budget.carryover - budgetWithCategory.budget.spent
+                )
+            }
+
+            val totalSpent = categorySpending.sumOf { it.spent }
+            val toBeBudgeted = totalBalance - totalBudgeted
+
+            BudgetingUiState(
+                currentMonth = month,
+                toBeBudgeted = toBeBudgeted,
+                totalBudgeted = totalBudgeted,
+                totalSpent = totalSpent,
+                categorySpending = categorySpending,
+                budgets = budgets,
+                isLoading = false
             )
         }
-
-        val totalSpent = categorySpending.sumOf { it.spent }
-        val toBeBudgeted = totalBalance - totalBudgeted
-
-        BudgetingUiState(
-            currentMonth = month,
-            toBeBudgeted = toBeBudgeted,
-            totalBudgeted = totalBudgeted,
-            totalSpent = totalSpent,
-            categorySpending = categorySpending,
-            budgets = budgets,
-            isLoading = false
-        )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),

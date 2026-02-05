@@ -23,6 +23,9 @@ import hilt_aggregated_deps._com_buddga_MainActivity_GeneratedInjector;
 import hilt_aggregated_deps._com_buddga_di_AppModule;
 import hilt_aggregated_deps._com_buddga_di_DatabaseModule;
 import hilt_aggregated_deps._com_buddga_di_RepositoryModule;
+import hilt_aggregated_deps._com_buddga_di_SettingsModule;
+import hilt_aggregated_deps._com_buddga_ui_screens_accounts_AccountDetailViewModel_HiltModules_BindsModule;
+import hilt_aggregated_deps._com_buddga_ui_screens_accounts_AccountDetailViewModel_HiltModules_KeyModule;
 import hilt_aggregated_deps._com_buddga_ui_screens_accounts_AccountsViewModel_HiltModules_BindsModule;
 import hilt_aggregated_deps._com_buddga_ui_screens_accounts_AccountsViewModel_HiltModules_KeyModule;
 import hilt_aggregated_deps._com_buddga_ui_screens_bills_AddBillViewModel_HiltModules_BindsModule;
@@ -39,6 +42,10 @@ import hilt_aggregated_deps._com_buddga_ui_screens_categories_AddCategoryViewMod
 import hilt_aggregated_deps._com_buddga_ui_screens_categories_AddCategoryViewModel_HiltModules_KeyModule;
 import hilt_aggregated_deps._com_buddga_ui_screens_forecast_CashFlowForecastViewModel_HiltModules_BindsModule;
 import hilt_aggregated_deps._com_buddga_ui_screens_forecast_CashFlowForecastViewModel_HiltModules_KeyModule;
+import hilt_aggregated_deps._com_buddga_ui_screens_reports_ReportsViewModel_HiltModules_BindsModule;
+import hilt_aggregated_deps._com_buddga_ui_screens_reports_ReportsViewModel_HiltModules_KeyModule;
+import hilt_aggregated_deps._com_buddga_ui_screens_settings_SettingsViewModel_HiltModules_BindsModule;
+import hilt_aggregated_deps._com_buddga_ui_screens_settings_SettingsViewModel_HiltModules_KeyModule;
 import hilt_aggregated_deps._com_buddga_ui_screens_transactions_AddTransactionViewModel_HiltModules_BindsModule;
 import hilt_aggregated_deps._com_buddga_ui_screens_transactions_AddTransactionViewModel_HiltModules_KeyModule;
 import hilt_aggregated_deps._com_buddga_ui_screens_transactions_TransactionsViewModel_HiltModules_BindsModule;
@@ -94,6 +101,9 @@ import hilt_aggregated_deps._dagger_hilt_android_internal_modules_HiltWrapper_Ac
         _com_buddga_di_AppModule.class,
         _com_buddga_di_DatabaseModule.class,
         _com_buddga_di_RepositoryModule.class,
+        _com_buddga_di_SettingsModule.class,
+        _com_buddga_ui_screens_accounts_AccountDetailViewModel_HiltModules_BindsModule.class,
+        _com_buddga_ui_screens_accounts_AccountDetailViewModel_HiltModules_KeyModule.class,
         _com_buddga_ui_screens_accounts_AccountsViewModel_HiltModules_BindsModule.class,
         _com_buddga_ui_screens_accounts_AccountsViewModel_HiltModules_KeyModule.class,
         _com_buddga_ui_screens_bills_AddBillViewModel_HiltModules_BindsModule.class,
@@ -110,6 +120,10 @@ import hilt_aggregated_deps._dagger_hilt_android_internal_modules_HiltWrapper_Ac
         _com_buddga_ui_screens_categories_AddCategoryViewModel_HiltModules_KeyModule.class,
         _com_buddga_ui_screens_forecast_CashFlowForecastViewModel_HiltModules_BindsModule.class,
         _com_buddga_ui_screens_forecast_CashFlowForecastViewModel_HiltModules_KeyModule.class,
+        _com_buddga_ui_screens_reports_ReportsViewModel_HiltModules_BindsModule.class,
+        _com_buddga_ui_screens_reports_ReportsViewModel_HiltModules_KeyModule.class,
+        _com_buddga_ui_screens_settings_SettingsViewModel_HiltModules_BindsModule.class,
+        _com_buddga_ui_screens_settings_SettingsViewModel_HiltModules_KeyModule.class,
         _com_buddga_ui_screens_transactions_AddTransactionViewModel_HiltModules_BindsModule.class,
         _com_buddga_ui_screens_transactions_AddTransactionViewModel_HiltModules_KeyModule.class,
         _com_buddga_ui_screens_transactions_TransactionsViewModel_HiltModules_BindsModule.class,

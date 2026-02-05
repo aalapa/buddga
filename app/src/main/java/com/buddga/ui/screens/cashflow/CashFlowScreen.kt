@@ -1,6 +1,5 @@
 package com.buddga.ui.screens.cashflow
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,6 +37,7 @@ import com.buddga.ui.components.CashFlowSummaryCards
 import com.buddga.ui.components.ChartLegendRow
 import com.buddga.ui.theme.ExpenseRed
 import com.buddga.ui.theme.IncomeGreen
+import java.math.BigDecimal
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -55,22 +55,19 @@ fun CashFlowScreen(
 
     Scaffold(
         topBar = {
-            // Compact header
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp)
-                    .background(MaterialTheme.colorScheme.primary)
-                    .padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Cash Flow",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimary
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "Cash Flow",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
                 )
-            }
+            )
         }
     ) { paddingValues ->
         LazyColumn(
@@ -80,9 +77,7 @@ fun CashFlowScreen(
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            item {
-                Spacer(modifier = Modifier.height(8.dp))
-            }
+            item { Spacer(modifier = Modifier.height(8.dp)) }
 
             // Income vs Expenses Chart
             item {
@@ -144,7 +139,7 @@ fun CashFlowScreen(
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(
-                        containerColor = if (uiState.netCashFlow >= java.math.BigDecimal.ZERO)
+                        containerColor = if (uiState.netCashFlow >= BigDecimal.ZERO)
                             IncomeGreen.copy(alpha = 0.1f)
                         else ExpenseRed.copy(alpha = 0.1f)
                     )
@@ -166,15 +161,15 @@ fun CashFlowScreen(
                                 text = currencyFormat.format(uiState.netCashFlow),
                                 style = MaterialTheme.typography.headlineSmall,
                                 fontWeight = FontWeight.Bold,
-                                color = if (uiState.netCashFlow >= java.math.BigDecimal.ZERO)
+                                color = if (uiState.netCashFlow >= BigDecimal.ZERO)
                                     IncomeGreen else ExpenseRed
                             )
                         }
                         Text(
-                            text = if (uiState.netCashFlow >= java.math.BigDecimal.ZERO)
+                            text = if (uiState.netCashFlow >= BigDecimal.ZERO)
                                 "Positive" else "Negative",
                             style = MaterialTheme.typography.labelLarge,
-                            color = if (uiState.netCashFlow >= java.math.BigDecimal.ZERO)
+                            color = if (uiState.netCashFlow >= BigDecimal.ZERO)
                                 IncomeGreen else ExpenseRed
                         )
                     }
@@ -230,9 +225,7 @@ fun CashFlowScreen(
                 }
             }
 
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-            }
+            item { Spacer(modifier = Modifier.height(16.dp)) }
         }
     }
 }

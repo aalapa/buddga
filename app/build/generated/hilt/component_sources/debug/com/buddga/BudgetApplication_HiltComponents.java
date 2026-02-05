@@ -4,6 +4,8 @@ import androidx.hilt.work.HiltWrapper_WorkerFactoryModule;
 import com.buddga.di.AppModule;
 import com.buddga.di.DatabaseModule;
 import com.buddga.di.RepositoryModule;
+import com.buddga.di.SettingsModule;
+import com.buddga.ui.screens.accounts.AccountDetailViewModel_HiltModules;
 import com.buddga.ui.screens.accounts.AccountsViewModel_HiltModules;
 import com.buddga.ui.screens.bills.AddBillViewModel_HiltModules;
 import com.buddga.ui.screens.bills.UpcomingBillsViewModel_HiltModules;
@@ -12,6 +14,8 @@ import com.buddga.ui.screens.budgeting.BudgetingViewModel_HiltModules;
 import com.buddga.ui.screens.cashflow.CashFlowViewModel_HiltModules;
 import com.buddga.ui.screens.categories.AddCategoryViewModel_HiltModules;
 import com.buddga.ui.screens.forecast.CashFlowForecastViewModel_HiltModules;
+import com.buddga.ui.screens.reports.ReportsViewModel_HiltModules;
+import com.buddga.ui.screens.settings.SettingsViewModel_HiltModules;
 import com.buddga.ui.screens.transactions.AddTransactionViewModel_HiltModules;
 import com.buddga.ui.screens.transactions.TransactionsViewModel_HiltModules;
 import com.buddga.ui.screens.warning.CashFlowWarningViewModel_HiltModules;
@@ -149,7 +153,8 @@ public final class BudgetApplication_HiltComponents {
           HiltWrapper_FragmentGetContextFix_FragmentGetContextFixModule.class,
           HiltWrapper_WorkerFactoryModule.class,
           RecurringTransactionWorker_HiltModule.class,
-          RepositoryModule.class
+          RepositoryModule.class,
+          SettingsModule.class
       }
   )
   @Singleton
@@ -172,6 +177,7 @@ public final class BudgetApplication_HiltComponents {
 
   @Subcomponent(
       modules = {
+          AccountDetailViewModel_HiltModules.KeyModule.class,
           AccountsViewModel_HiltModules.KeyModule.class,
           AddBillViewModel_HiltModules.KeyModule.class,
           AddBudgetViewModel_HiltModules.KeyModule.class,
@@ -185,6 +191,8 @@ public final class BudgetApplication_HiltComponents {
           CashFlowWarningViewModel_HiltModules.KeyModule.class,
           HiltWrapper_ActivityRetainedComponentManager_LifecycleModule.class,
           HiltWrapper_SavedStateHandleModule.class,
+          ReportsViewModel_HiltModules.KeyModule.class,
+          SettingsViewModel_HiltModules.KeyModule.class,
           TransactionsViewModel_HiltModules.KeyModule.class,
           UpcomingBillsViewModel_HiltModules.KeyModule.class,
           WeeklyCashFlowViewModel_HiltModules.KeyModule.class
@@ -223,6 +231,7 @@ public final class BudgetApplication_HiltComponents {
 
   @Subcomponent(
       modules = {
+          AccountDetailViewModel_HiltModules.BindsModule.class,
           AccountsViewModel_HiltModules.BindsModule.class,
           AddBillViewModel_HiltModules.BindsModule.class,
           AddBudgetViewModel_HiltModules.BindsModule.class,
@@ -233,6 +242,8 @@ public final class BudgetApplication_HiltComponents {
           CashFlowViewModel_HiltModules.BindsModule.class,
           CashFlowWarningViewModel_HiltModules.BindsModule.class,
           HiltWrapper_HiltViewModelFactory_ViewModelModule.class,
+          ReportsViewModel_HiltModules.BindsModule.class,
+          SettingsViewModel_HiltModules.BindsModule.class,
           TransactionsViewModel_HiltModules.BindsModule.class,
           UpcomingBillsViewModel_HiltModules.BindsModule.class,
           WeeklyCashFlowViewModel_HiltModules.BindsModule.class

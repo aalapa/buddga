@@ -18,49 +18,59 @@ import androidx.core.view.WindowCompat
 private val LightColorScheme = lightColorScheme(
     primary = Primary,
     onPrimary = OnPrimary,
-    primaryContainer = PrimaryVariant,
+    primaryContainer = PrimaryLight,
     onPrimaryContainer = OnPrimary,
     secondary = Secondary,
     onSecondary = OnSecondary,
-    secondaryContainer = SecondaryVariant,
-    onSecondaryContainer = OnSecondary,
-    tertiary = CategoryIncome,
+    secondaryContainer = SecondaryLight.copy(alpha = 0.3f),
+    onSecondaryContainer = SecondaryDark,
+    tertiary = InfoBlue,
     onTertiary = OnPrimary,
     background = Background,
     onBackground = OnBackground,
     surface = Surface,
     onSurface = OnSurface,
-    surfaceVariant = Background,
-    onSurfaceVariant = OnSurface,
+    surfaceVariant = SurfaceContainerHigh,
+    onSurfaceVariant = OnSurfaceVariant,
+    surfaceContainerLow = SurfaceContainer,
+    surfaceContainer = SurfaceContainer,
+    surfaceContainerHigh = SurfaceContainerHigh,
     error = Error,
-    onError = OnError
+    onError = OnError,
+    outline = OnSurfaceVariant.copy(alpha = 0.3f),
+    outlineVariant = OnSurfaceVariant.copy(alpha = 0.12f)
 )
 
 private val DarkColorScheme = darkColorScheme(
-    primary = PrimaryDark,
+    primary = PrimaryDarkTheme,
     onPrimary = OnPrimary,
-    primaryContainer = PrimaryVariantDark,
+    primaryContainer = PrimaryVariantDarkTheme,
     onPrimaryContainer = OnPrimary,
-    secondary = SecondaryDark,
+    secondary = SecondaryDarkTheme,
     onSecondary = OnSecondary,
-    secondaryContainer = SecondaryVariant,
-    onSecondaryContainer = OnSecondary,
-    tertiary = CategoryIncome,
+    secondaryContainer = SecondaryDark,
+    onSecondaryContainer = SecondaryDarkTheme,
+    tertiary = InfoBlue,
     onTertiary = OnPrimary,
-    background = BackgroundDark,
-    onBackground = OnBackgroundDark,
-    surface = SurfaceDark,
-    onSurface = OnSurfaceDark,
-    surfaceVariant = SurfaceDark,
-    onSurfaceVariant = OnSurfaceDark,
+    background = BackgroundDarkTheme,
+    onBackground = OnBackgroundDarkTheme,
+    surface = SurfaceDarkTheme,
+    onSurface = OnSurfaceDarkTheme,
+    surfaceVariant = SurfaceContainerHighDark,
+    onSurfaceVariant = OnSurfaceVariantDark,
+    surfaceContainerLow = SurfaceContainerDark,
+    surfaceContainer = SurfaceContainerDark,
+    surfaceContainerHigh = SurfaceContainerHighDark,
     error = Error,
-    onError = OnError
+    onError = OnError,
+    outline = OnSurfaceVariantDark.copy(alpha = 0.3f),
+    outlineVariant = OnSurfaceVariantDark.copy(alpha = 0.12f)
 )
 
 @Composable
 fun BudgetTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = false, // Disabled by default to use custom colors
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
